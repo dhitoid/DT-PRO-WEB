@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Kalkulator KPR Pintar</title>
 
-<!-- Font -->
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
@@ -43,7 +42,18 @@ body{
 .container{
   max-width:520px;
   margin:auto;
-  padding:32px 20px 120px;
+  padding:32px 20px 140px;
+}
+
+.hero-badge{
+  display:inline-block;
+  padding:6px 14px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:600;
+  margin-bottom:12px;
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  color:white;
 }
 
 .hero h1{
@@ -96,11 +106,18 @@ input{
   margin:6px 0 0;
 }
 
+.premium-note{
+  margin-top:12px;
+  font-size:13px;
+  color:var(--muted);
+}
+
+/* CTA */
 .cta{
   position:fixed;
   left:0;right:0;bottom:0;
   padding:14px;
-  background:linear-gradient(180deg,transparent,rgba(0,0,0,.15));
+  backdrop-filter: blur(10px);
 }
 .cta button{
   width:100%;
@@ -112,6 +129,45 @@ input{
   color:white;
   background:linear-gradient(135deg,var(--primary),var(--accent));
 }
+
+/* MODAL LEAD */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.45);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+}
+.modal.active{display:flex}
+
+.modal-card{
+  width:90%;
+  max-width:420px;
+  background:var(--card);
+  border-radius:24px;
+  padding:22px;
+  border:1px solid var(--border);
+}
+.modal-card h3{
+  margin:0 0 6px;
+}
+.modal-card p{
+  font-size:14px;
+  color:var(--muted);
+  margin-bottom:16px;
+}
+.modal-card button{
+  margin-top:10px;
+  width:100%;
+  padding:14px;
+  border-radius:16px;
+  border:none;
+  font-weight:600;
+  color:white;
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+}
 </style>
 </head>
 
@@ -119,8 +175,9 @@ input{
 <div class="container">
 
   <section class="hero">
+    <div class="hero-badge">Kalkulator KPR • Versi Profesional</div>
     <h1>Hitung Cicilan Rumah<br>Secara Realistis</h1>
-    <p>Kalkulator KPR modern dengan simulasi DP & booking fee.</p>
+    <p>Kalkulator modern dengan simulasi DP & strategi cicilan terbaik.</p>
   </section>
 
   <section class="card">
@@ -145,43 +202,79 @@ input{
       <small>Perkiraan Cicilan / bulan</small>
       <h2 id="hasil">Rp 0</h2>
     </div>
+
+    <div class="premium-note">
+      🔓 Versi Premium: PDF + Excel + simulasi detail
+    </div>
   </section>
 
 </div>
 
 <div class="cta">
-  <button onclick="kirimWA()">💬 Kirim Hasil ke WhatsApp</button>
+  <button onclick="openLead()">💬 Konsultasi & Hasil Lengkap</button>
+</div>
+
+<!-- MODAL -->
+<div class="modal" id="leadModal">
+  <div class="modal-card">
+    <h3>Dapatkan Hasil Lengkap</h3>
+    <p>Kami kirim simulasi detail + konsultasi gratis via WhatsApp.</p>
+
+    <div class="field">
+      <label>Nama</label>
+      <input id="namaLead" placeholder="Nama kamu">
+    </div>
+    <div class="field">
+      <label>Nomor WhatsApp</label>
+      <input id="waLead" placeholder="08xxxxxxxxxx">
+    </div>
+
+    <button onclick="submitLead()">Kirim ke WhatsApp</button>
+  </div>
 </div>
 
 <script>
-function hitung(){
-  const harga = +hargaEl.value;
-  const dp = harga * (+dpEl.value/100);
-  const pokok = harga - dp;
-  const bulan = +tenorEl.value * 12;
-  const bunga = (+bungaEl.value/100)/12;
-
-  const cicilan = pokok * bunga / (1 - Math.pow(1+bunga, -bulan));
-  hasil.textContent = "Rp " + cicilan.toLocaleString("id-ID");
-}
-
-function kirimWA(){
-  const text = encodeURIComponent(
-    "Hasil Simulasi KPR:\n" +
-    "Harga: Rp " + hargaEl.value + "\n" +
-    "Cicilan: " + hasil.textContent
-  );
-  window.open("https://wa.me/62XXXXXXXXXX?text="+text);
-}
-
 const hargaEl = document.getElementById("harga");
 const dpEl = document.getElementById("dp");
 const tenorEl = document.getElementById("tenor");
 const bungaEl = document.getElementById("bunga");
 const hasil = document.getElementById("hasil");
 
+function hitung(){
+  const harga = +hargaEl.value;
+  const dp = harga * (+dpEl.value/100);
+  const pokok = harga - dp;
+  const bulan = +tenorEl.value * 12;
+  const bunga = (+bungaEl.value/100)/12;
+  const cicilan = pokok * bunga / (1 - Math.pow(1+bunga, -bulan));
+  hasil.textContent = "Rp " + cicilan.toLocaleString("id-ID");
+}
+
 [hargaEl,dpEl,tenorEl,bungaEl].forEach(el=>el.addEventListener("input",hitung));
 hitung();
+
+function openLead(){
+  document.getElementById("leadModal").classList.add("active");
+}
+
+function submitLead(){
+  const nama = document.getElementById("namaLead").value;
+  const wa = document.getElementById("waLead").value;
+
+  if(!nama || !wa){
+    alert("Lengkapi data dulu ya");
+    return;
+  }
+
+  const text = encodeURIComponent(
+    "Halo, saya mau konsultasi KPR.\n\n" +
+    "Nama: " + nama + "\n" +
+    "Harga Rumah: Rp " + hargaEl.value + "\n" +
+    "Cicilan: " + hasil.textContent
+  );
+
+  window.open("https://wa.me/6281802168184text="+text);
+}
 </script>
 </body>
 </html>
