@@ -259,22 +259,28 @@ function closeLead(e){
   if(!e || e.target===leadModal) leadModal.classList.remove("active");
 }
 
-const SHEET_API = "https://script.google.com/macros/s/AKfycbx3Mkrm0NQpmUjPWrld1HzKc6gZLn--mmYOLYOXm-zZumJk2rbFPwj6Cal73z7wZQjr/exec";
+const SHEET_API = "https://script.google.com/macros/s/AKfycbycSF49ZDlOxYllsCrSS6fP3z3GCU25F2D1VWmccwTxBb0enKnNjWGUGwzZu2F1jW0o/exec";
 
 function submitLead(){
   if(!namaLead.value||!waLead.value) return alert("Lengkapi data dulu ya");
 
-  fetch(SHEET_API,{
-    method:"POST",
-    mode:"no-cors",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({
-      nama:namaLead.value,
-      wa:waLead.value,
-      harga:formatRupiah(cleanNumber(hargaEl.value)),
-      cicilan:hasil.textContent
-    })
-  });
+fetch(SHEET_API, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    nama: nama,
+    wa: wa,
+    harga: harga,
+    cicilan: cicilan
+  })
+})
+.then(res => res.json())
+.then(res => {
+  console.log("SHEET:", res);
+})
+.catch(err => console.error(err));
 
   window.open(
     "https://wa.me/6281802168184?text="+encodeURIComponent(
