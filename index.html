@@ -218,27 +218,40 @@ input{
 </div>
 
 <script>
-/* FORMAT */
-function formatRupiah(n){return n.toLocaleString("id-ID")}
-function cleanNumber(v){return parseInt(v.replace(/\./g,""))||0}
+/* FORMAT ANGKA */
+function formatRupiah(n){
+  return n.toLocaleString("id-ID");
+}
+function cleanNumber(v){
+  return parseInt(v.replace(/\./g,"")) || 0;
+}
 
-const hargaEl = harga, dpEl = dp, tenorEl = tenor, bungaEl = bunga, hasil = hasil;
+const hargaEl = document.getElementById("harga");
+const dpEl = document.getElementById("dp");
+const tenorEl = document.getElementById("tenor");
+const bungaEl = document.getElementById("bunga");
+const hasil = document.getElementById("hasil");
 
+/* INPUT FORMAT */
 hargaEl.addEventListener("input",()=>{
-  hargaEl.value = formatRupiah(cleanNumber(hargaEl.value));
+  const num = cleanNumber(hargaEl.value);
+  hargaEl.value = formatRupiah(num);
   hitung();
 });
 
+/* HITUNG CICILAN */
 function hitung(){
   const harga = cleanNumber(hargaEl.value);
-  const dpv = harga*(dpEl.value/100);
-  const pokok = harga-dpv;
-  const bulan = tenorEl.value*12;
+  const dp = harga * (dpEl.value/100);
+  const pokok = harga - dp;
+  const bulan = tenorEl.value * 12;
   const bunga = (bungaEl.value/100)/12;
-  const cicilan = pokok*bunga/(1-Math.pow(1+bunga,-bulan));
-  hasil.textContent = "Rp "+formatRupiah(Math.round(cicilan));
+
+  const cicilan = pokok * bunga / (1 - Math.pow(1+bunga, -bulan));
+  hasil.textContent = "Rp " + formatRupiah(Math.round(cicilan));
 }
-[hargaEl,dpEl,tenorEl,bungaEl].forEach(e=>e.addEventListener("input",hitung));
+
+[hargaEl,dpEl,tenorEl,bungaEl].forEach(el=>el.addEventListener("input",hitung));
 hitung();
 
 function openLead(){leadModal.classList.add("active")}
