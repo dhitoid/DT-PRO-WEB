@@ -17,7 +17,6 @@
   --accent:#22d3ee;
   --border:#e5e7eb;
 }
-
 @media (prefers-color-scheme: dark){
   :root{
     --bg:#0b1020;
@@ -75,13 +74,8 @@ body{
   box-shadow:0 20px 40px rgba(0,0,0,.08);
 }
 
-.field{
-  margin-bottom:16px;
-}
-label{
-  font-size:13px;
-  color:var(--muted);
-}
+.field{margin-bottom:16px}
+label{font-size:13px;color:var(--muted)}
 input{
   width:100%;
   margin-top:6px;
@@ -100,19 +94,11 @@ input{
   background:linear-gradient(135deg,var(--primary),var(--accent));
   color:white;
 }
-.result small{opacity:.9}
 .result h2{
   font-size:32px;
   margin:6px 0 0;
 }
 
-.premium-note{
-  margin-top:12px;
-  font-size:13px;
-  color:var(--muted);
-}
-
-/* CTA */
 .cta{
   position:fixed;
   left:0;right:0;bottom:0;
@@ -130,7 +116,6 @@ input{
   background:linear-gradient(135deg,var(--primary),var(--accent));
 }
 
-/* MODAL LEAD */
 .modal{
   position:fixed;
   inset:0;
@@ -150,16 +135,8 @@ input{
   padding:22px;
   border:1px solid var(--border);
 }
-.modal-card h3{
-  margin:0 0 6px;
-}
-.modal-card p{
-  font-size:14px;
-  color:var(--muted);
-  margin-bottom:16px;
-}
 .modal-card button{
-  margin-top:10px;
+  margin-top:12px;
   width:100%;
   padding:14px;
   border-radius:16px;
@@ -174,39 +151,35 @@ input{
 <body>
 <div class="container">
 
-  <section class="hero">
-    <div class="hero-badge">Kalkulator KPR • Versi Profesional</div>
-    <h1>Hitung Cicilan Rumah<br>Secara Realistis</h1>
-    <p>Kalkulator modern dengan simulasi DP & strategi cicilan terbaik.</p>
-  </section>
+<section class="hero">
+  <div class="hero-badge">Kalkulator KPR • Versi Profesional</div>
+  <h1>Hitung Cicilan Rumah<br>Secara Realistis</h1>
+  <p>Kalkulator modern dengan simulasi DP & strategi cicilan terbaik.</p>
+</section>
 
-  <section class="card">
-    <div class="field">
-      <label>Harga Rumah</label>
-      <input id="harga" type="number" value="500000000">
-    </div>
-    <div class="field">
-      <label>DP (%)</label>
-      <input id="dp" type="number" value="10">
-    </div>
-    <div class="field">
-      <label>Tenor (Tahun)</label>
-      <input id="tenor" type="number" value="20">
-    </div>
-    <div class="field">
-      <label>Bunga (% / tahun)</label>
-      <input id="bunga" type="number" value="8">
-    </div>
+<section class="card">
+  <div class="field">
+    <label>Harga Rumah</label>
+    <input id="harga" inputmode="numeric" value="500.000.000">
+  </div>
+  <div class="field">
+    <label>DP (%)</label>
+    <input id="dp" type="number" value="10">
+  </div>
+  <div class="field">
+    <label>Tenor (Tahun)</label>
+    <input id="tenor" type="number" value="20">
+  </div>
+  <div class="field">
+    <label>Bunga (% / tahun)</label>
+    <input id="bunga" type="number" value="8">
+  </div>
 
-    <div class="result">
-      <small>Perkiraan Cicilan / bulan</small>
-      <h2 id="hasil">Rp 0</h2>
-    </div>
-
-    <div class="premium-note">
-      🔓 Versi Premium: PDF + Excel + simulasi detail
-    </div>
-  </section>
+  <div class="result">
+    <small>Perkiraan Cicilan / bulan</small>
+    <h2 id="hasil">Rp 0</h2>
+  </div>
+</section>
 
 </div>
 
@@ -214,19 +187,17 @@ input{
   <button onclick="openLead()">💬 Konsultasi & Hasil Lengkap</button>
 </div>
 
-<!-- MODAL -->
 <div class="modal" id="leadModal">
   <div class="modal-card">
     <h3>Dapatkan Hasil Lengkap</h3>
-    <p>Kami kirim simulasi detail + konsultasi gratis via WhatsApp.</p>
 
     <div class="field">
       <label>Nama</label>
-      <input id="namaLead" placeholder="Nama kamu">
+      <input id="namaLead">
     </div>
     <div class="field">
-      <label>Nomor WhatsApp</label>
-      <input id="waLead" placeholder="08xxxxxxxxxx">
+      <label>WhatsApp</label>
+      <input id="waLead">
     </div>
 
     <button onclick="submitLead()">Kirim ke WhatsApp</button>
@@ -234,20 +205,37 @@ input{
 </div>
 
 <script>
+/* FORMAT ANGKA */
+function formatRupiah(n){
+  return n.toLocaleString("id-ID");
+}
+function cleanNumber(v){
+  return parseInt(v.replace(/\./g,"")) || 0;
+}
+
 const hargaEl = document.getElementById("harga");
 const dpEl = document.getElementById("dp");
 const tenorEl = document.getElementById("tenor");
 const bungaEl = document.getElementById("bunga");
 const hasil = document.getElementById("hasil");
 
+/* INPUT FORMAT */
+hargaEl.addEventListener("input",()=>{
+  const num = cleanNumber(hargaEl.value);
+  hargaEl.value = formatRupiah(num);
+  hitung();
+});
+
+/* HITUNG CICILAN */
 function hitung(){
-  const harga = +hargaEl.value;
-  const dp = harga * (+dpEl.value/100);
+  const harga = cleanNumber(hargaEl.value);
+  const dp = harga * (dpEl.value/100);
   const pokok = harga - dp;
-  const bulan = +tenorEl.value * 12;
-  const bunga = (+bungaEl.value/100)/12;
+  const bulan = tenorEl.value * 12;
+  const bunga = (bungaEl.value/100)/12;
+
   const cicilan = pokok * bunga / (1 - Math.pow(1+bunga, -bulan));
-  hasil.textContent = "Rp " + cicilan.toLocaleString("id-ID");
+  hasil.textContent = "Rp " + formatRupiah(Math.round(cicilan));
 }
 
 [hargaEl,dpEl,tenorEl,bungaEl].forEach(el=>el.addEventListener("input",hitung));
@@ -258,8 +246,8 @@ function openLead(){
 }
 
 function submitLead(){
-  const nama = document.getElementById("namaLead").value;
-  const wa = document.getElementById("waLead").value;
+  const nama = namaLead.value;
+  const wa = waLead.value;
 
   if(!nama || !wa){
     alert("Lengkapi data dulu ya");
@@ -268,12 +256,12 @@ function submitLead(){
 
   const text = encodeURIComponent(
     "Halo, saya mau konsultasi KPR.\n\n" +
-    "Nama: " + nama + "\n" +
-    "Harga Rumah: Rp " + hargaEl.value + "\n" +
-    "Cicilan: " + hasil.textContent
+    "Nama: "+nama+"\n" +
+    "Harga Rumah: Rp "+formatRupiah(cleanNumber(hargaEl.value))+"\n" +
+    "Cicilan: "+hasil.textContent
   );
 
-  window.open("https://wa.me/6281802168184text="+text);
+  window.open("https://wa.me/6281802168184?text="+text);
 }
 </script>
 </body>
