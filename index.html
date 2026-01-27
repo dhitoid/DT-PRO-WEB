@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kalkulator KPR Pintar</title>
+
+<!-- Font -->
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#f7f8fc;
+  --card:#ffffffcc;
+  --text:#0f172a;
+  --muted:#64748b;
+  --primary:#6366f1;
+  --accent:#22d3ee;
+  --border:#e5e7eb;
+}
+
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0b1020;
+    --card:#0f172acc;
+    --text:#e5e7eb;
+    --muted:#94a3b8;
+    --border:#1f2937;
+  }
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:"Plus Jakarta Sans",sans-serif;
+  background:
+    radial-gradient(80% 40% at 50% -10%, rgba(99,102,241,.25), transparent),
+    radial-gradient(60% 30% at 100% 0%, rgba(34,211,238,.25), transparent),
+    var(--bg);
+  color:var(--text);
+}
+
+.container{
+  max-width:520px;
+  margin:auto;
+  padding:32px 20px 120px;
+}
+
+.hero h1{
+  font-size:34px;
+  line-height:1.2;
+  margin-bottom:12px;
+}
+.hero p{
+  color:var(--muted);
+  margin-bottom:28px;
+}
+
+.card{
+  background:var(--card);
+  backdrop-filter: blur(14px);
+  border:1px solid var(--border);
+  border-radius:24px;
+  padding:22px;
+  box-shadow:0 20px 40px rgba(0,0,0,.08);
+}
+
+.field{
+  margin-bottom:16px;
+}
+label{
+  font-size:13px;
+  color:var(--muted);
+}
+input{
+  width:100%;
+  margin-top:6px;
+  padding:14px 16px;
+  border-radius:16px;
+  border:1px solid var(--border);
+  background:transparent;
+  color:var(--text);
+  font-size:16px;
+}
+
+.result{
+  margin-top:20px;
+  padding:18px;
+  border-radius:18px;
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  color:white;
+}
+.result small{opacity:.9}
+.result h2{
+  font-size:32px;
+  margin:6px 0 0;
+}
+
+.cta{
+  position:fixed;
+  left:0;right:0;bottom:0;
+  padding:14px;
+  background:linear-gradient(180deg,transparent,rgba(0,0,0,.15));
+}
+.cta button{
+  width:100%;
+  padding:16px;
+  border-radius:18px;
+  border:none;
+  font-size:16px;
+  font-weight:600;
+  color:white;
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+  <section class="hero">
+    <h1>Hitung Cicilan Rumah<br>Secara Realistis</h1>
+    <p>Kalkulator KPR modern dengan simulasi DP & booking fee.</p>
+  </section>
+
+  <section class="card">
+    <div class="field">
+      <label>Harga Rumah</label>
+      <input id="harga" type="number" value="500000000">
+    </div>
+    <div class="field">
+      <label>DP (%)</label>
+      <input id="dp" type="number" value="10">
+    </div>
+    <div class="field">
+      <label>Tenor (Tahun)</label>
+      <input id="tenor" type="number" value="20">
+    </div>
+    <div class="field">
+      <label>Bunga (% / tahun)</label>
+      <input id="bunga" type="number" value="8">
+    </div>
+
+    <div class="result">
+      <small>Perkiraan Cicilan / bulan</small>
+      <h2 id="hasil">Rp 0</h2>
+    </div>
+  </section>
+
+</div>
+
+<div class="cta">
+  <button onclick="kirimWA()">💬 Kirim Hasil ke WhatsApp</button>
+</div>
+
+<script>
+function hitung(){
+  const harga = +hargaEl.value;
+  const dp = harga * (+dpEl.value/100);
+  const pokok = harga - dp;
+  const bulan = +tenorEl.value * 12;
+  const bunga = (+bungaEl.value/100)/12;
+
+  const cicilan = pokok * bunga / (1 - Math.pow(1+bunga, -bulan));
+  hasil.textContent = "Rp " + cicilan.toLocaleString("id-ID");
+}
+
+function kirimWA(){
+  const text = encodeURIComponent(
+    "Hasil Simulasi KPR:\n" +
+    "Harga: Rp " + hargaEl.value + "\n" +
+    "Cicilan: " + hasil.textContent
+  );
+  window.open("https://wa.me/62XXXXXXXXXX?text="+text);
+}
+
+const hargaEl = document.getElementById("harga");
+const dpEl = document.getElementById("dp");
+const tenorEl = document.getElementById("tenor");
+const bungaEl = document.getElementById("bunga");
+const hasil = document.getElementById("hasil");
+
+[hargaEl,dpEl,tenorEl,bungaEl].forEach(el=>el.addEventListener("input",hitung));
+hitung();
+</script>
+</body>
+</html>
