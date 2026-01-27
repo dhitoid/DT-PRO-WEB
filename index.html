@@ -245,6 +245,8 @@ function openLead(){
   document.getElementById("leadModal").classList.add("active");
 }
 
+const SHEET_API = "https://script.google.com/macros/s/AKfycbx3Mkrm0NQpmUjPWrld1HzKc6gZLn--mmYOLYOXm-zZumJk2rbFPwj6Cal73z7wZQjr/exec";
+
 function submitLead(){
   const nama = namaLead.value;
   const wa = waLead.value;
@@ -254,11 +256,26 @@ function submitLead(){
     return;
   }
 
+  const harga = formatRupiah(cleanNumber(hargaEl.value));
+  const cicilan = hasil.textContent;
+
+  /* SIMPAN KE GOOGLE SHEET */
+  fetch(SHEET_API,{
+    method:"POST",
+    body:JSON.stringify({
+      nama:nama,
+      wa:wa,
+      harga:harga,
+      cicilan:cicilan
+    })
+  });
+
+  /* LANJUT KE WHATSAPP */
   const text = encodeURIComponent(
     "Halo, saya mau konsultasi KPR.\n\n" +
     "Nama: "+nama+"\n" +
-    "Harga Rumah: Rp "+formatRupiah(cleanNumber(hargaEl.value))+"\n" +
-    "Cicilan: "+hasil.textContent
+    "Harga Rumah: Rp "+harga+"\n" +
+    "Cicilan: "+cicilan
   );
 
   window.open("https://wa.me/6281802168184?text="+text);
