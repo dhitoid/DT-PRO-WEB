@@ -259,7 +259,7 @@ function closeLead(e){
   if(!e || e.target===leadModal) leadModal.classList.remove("active");
 }
 
-const SHEET_API = "https://script.google.com/macros/s/AKfycbx9nfa--UGkKdpJ__x5698w17aINSqmdc2ZRN28RkZGJrinDPEklJNSMu7yucjaEXWB/exec";
+const SHEET_API = "https://script.google.com/macros/s/AKfycbwzH6Dfe9rYXbZC8a0ziSGiEiOsWct4qgyqi5bVEP5bDVPQubnziv4gstvGL73XMl-8/exec";
 
 function submitLead(){
   const nama = namaLead.value.trim();
@@ -278,28 +278,36 @@ function submitLead(){
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      nama: nama,
-      wa: wa,
-      harga: harga,
-      cicilan: cicilan
+      nama,
+      wa,
+      harga,
+      cicilan
     })
   })
   .then(res => res.json())
   .then(res => {
     console.log("SHEET RESPONSE:", res);
+
+    if(res.status !== "success"){
+      alert("Gagal simpan data");
+      return;
+    }
+
+    window.open(
+      "https://wa.me/6281802168184?text="+encodeURIComponent(
+        "Halo, saya mau konsultasi KPR\n\n"+
+        "Nama: "+nama+"\n"+
+        "Harga Rumah: Rp "+harga+"\n"+
+        "Cicilan: "+cicilan
+      )
+    );
+
+    closeLead();
   })
-  .catch(err => console.error("FETCH ERROR:", err));
-
-  window.open(
-    "https://wa.me/6281802168184?text="+encodeURIComponent(
-      "Halo, saya mau konsultasi KPR\n\n"+
-      "Nama: "+nama+"\n"+
-      "Harga Rumah: Rp "+harga+"\n"+
-      "Cicilan: "+cicilan
-    )
-  );
-
-  closeLead();
+  .catch(err => {
+    console.error("FETCH ERROR:", err);
+    alert("Koneksi gagal");
+  });
 }
 </script>
 </body>
