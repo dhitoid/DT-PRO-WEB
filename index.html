@@ -262,17 +262,15 @@ function closeLead(e){
 const SHEET_API = "https://script.google.com/macros/s/AKfycbyu-iA8zNtIV5Z3eaUokoI4sLS3yVI_tTHVLQYjbBiAnzCIsGbag2yma1psgR41zpDa/exec";
 
 function submitLead(){
-
   const nama = namaLead.value.trim();
   const wa = waLead.value.trim();
+  const harga = formatRupiah(cleanNumber(hargaEl.value));
+  const cicilan = hasil.textContent;
 
   if(!nama || !wa){
     alert("Lengkapi data dulu ya");
     return;
   }
-
-  const harga = formatRupiah(cleanNumber(hargaEl.value));
-  const cicilan = hasil.textContent;
 
   fetch(SHEET_API, {
     method: "POST",
@@ -286,17 +284,18 @@ function submitLead(){
       cicilan: cicilan
     })
   })
-  .then(r => r.text())
-  .then(r => console.log("RESP SHEET:", r))
-  .catch(err => console.error("ERROR:", err));
+  .then(res => res.json())
+  .then(res => {
+    console.log("SHEET RESPONSE:", res);
+  })
+  .catch(err => console.error("FETCH ERROR:", err));
 
   window.open(
-    "https://wa.me/6281802168184?text=" + encodeURIComponent(
-      "Halo, saya mau konsultasi KPR\n\n" +
-      "Nama: " + nama + "\n" +
-      "WhatsApp: " + wa + "\n" +
-      "Harga Rumah: Rp " + harga + "\n" +
-      "Cicilan: " + cicilan
+    "https://wa.me/6281802168184?text="+encodeURIComponent(
+      "Halo, saya mau konsultasi KPR\n\n"+
+      "Nama: "+nama+"\n"+
+      "Harga Rumah: Rp "+harga+"\n"+
+      "Cicilan: "+cicilan
     )
   );
 
