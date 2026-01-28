@@ -262,34 +262,45 @@ function closeLead(e){
 const SHEET_API = "https://script.google.com/macros/s/AKfycbycSF49ZDlOxYllsCrSS6fP3z3GCU25F2D1VWmccwTxBb0enKnNjWGUGwzZu2F1jW0o/exec";
 
 function submitLead(){
-  if(!namaLead.value||!waLead.value) return alert("Lengkapi data dulu ya");
 
-fetch(SHEET_API, {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    nama: nama,
-    wa: wa,
-    harga: harga,
-    cicilan: cicilan
+  const nama = namaLead.value.trim();
+  const wa = waLead.value.trim();
+
+  if(!nama || !wa){
+    alert("Lengkapi data dulu ya");
+    return;
+  }
+
+  const harga = formatRupiah(cleanNumber(hargaEl.value));
+  const cicilan = hasil.textContent;
+
+  fetch(SHEET_API, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      nama: nama,
+      wa: wa,
+      harga: harga,
+      cicilan: cicilan
+    })
   })
-})
-.then(res => res.json())
-.then(res => {
-  console.log("SHEET:", res);
-})
-.catch(err => console.error(err));
+  .then(r => r.text())
+  .then(r => console.log("RESP SHEET:", r))
+  .catch(err => console.error("ERROR:", err));
 
   window.open(
-    "https://wa.me/6281802168184?text="+encodeURIComponent(
-      "Halo, saya mau konsultasi KPR\n\n"+
-      "Nama: "+namaLead.value+"\n"+
-      "Harga Rumah: Rp "+formatRupiah(cleanNumber(hargaEl.value))+"\n"+
-      "Cicilan: "+hasil.textContent
+    "https://wa.me/6281802168184?text=" + encodeURIComponent(
+      "Halo, saya mau konsultasi KPR\n\n" +
+      "Nama: " + nama + "\n" +
+      "WhatsApp: " + wa + "\n" +
+      "Harga Rumah: Rp " + harga + "\n" +
+      "Cicilan: " + cicilan
     )
   );
+
+  closeLead();
 }
 </script>
 </body>
