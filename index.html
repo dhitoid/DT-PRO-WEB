@@ -272,6 +272,18 @@ function submitLead(){
     return;
   }
 
+  // 👉 1. LANGSUNG BUKA WA (masih konteks klik user)
+  window.open(
+    "https://wa.me/6281802168184?text=" + encodeURIComponent(
+      "Halo, saya mau konsultasi KPR\n\n"+
+      "Nama: "+nama+"\n"+
+      "Harga Rumah: Rp "+harga+"\n"+
+      "Cicilan: "+cicilan
+    ),
+    "_blank"
+  );
+
+  // 👉 2. BARU KIRIM KE GOOGLE SHEET (async, aman)
   fetch(SHEET_API, {
     method: "POST",
     headers: {
@@ -287,27 +299,12 @@ function submitLead(){
   .then(res => res.json())
   .then(res => {
     console.log("SHEET RESPONSE:", res);
-
-    if(res.status !== "success"){
-      alert("Gagal simpan data");
-      return;
-    }
-
-    window.open(
-      "https://wa.me/6281802168184?text="+encodeURIComponent(
-        "Halo, saya mau konsultasi KPR\n\n"+
-        "Nama: "+nama+"\n"+
-        "Harga Rumah: Rp "+harga+"\n"+
-        "Cicilan: "+cicilan
-      )
-    );
-
-    closeLead();
   })
   .catch(err => {
     console.error("FETCH ERROR:", err);
-    alert("Koneksi gagal");
   });
+
+  closeLead();
 }
 </script>
 </body>
