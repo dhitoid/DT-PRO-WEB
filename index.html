@@ -207,6 +207,34 @@ input.error{
 }
 /* ================== */
 
+.range{
+  width:100%;
+  accent-color:var(--primary);
+  margin-top:8px;
+}
+
+.info-box{
+  margin-top:16px;
+  padding:14px;
+  border-radius:16px;
+  background:rgba(99,102,241,.08);
+  font-size:13px;
+}
+
+.testi{
+  margin-top:18px;
+  padding:16px;
+  border-radius:16px;
+  background:rgba(0,0,0,.05);
+  font-size:13px;
+}
+
+.disclaimer{
+  margin-top:14px;
+  font-size:11px;
+  color:var(--muted);
+  text-align:center;
+}
 </style>
 </head>
 
@@ -227,13 +255,14 @@ input.error{
     <div class="field">
       <label>DP (%)</label>
       <input id="dp" type="number" value="10">
+      <input type="range" min="5" max="100" value="10" class="range" id="dpRange">
     </div>
 
     <!-- PROGRESS DP -->
     <div class="progress-wrap">
       <div class="progress-label">
         <span>DP</span>
-        <strong><span id="dpVal">10</span>%</strong>
+        <strong><span id="dpVal">5</span>%</strong>
       </div>
       <div class="progress-bar">
         <div class="progress-fill" id="dpBar"></div>
@@ -243,6 +272,7 @@ input.error{
     <div class="field">
       <label>Tenor (Tahun)</label>
       <input id="tenor" type="number" value="20">
+      <input type="range" min="5" max="30" value="20" class="range" id="tenorRange">
     </div>
 
     <!-- PROGRESS TENOR -->
@@ -265,6 +295,25 @@ input.error{
       <small>Perkiraan Cicilan / bulan</small>
       <h2 id="hasil">Rp 0</h2>
     </div>
+    
+    <!-- ESTIMASI GAJI -->
+  <div class="info-box">
+    💼 Estimasi gaji minimal agar aman:
+    <strong id="gajiMin">Rp 0</strong>
+    <br><small>(maks. 30% dari penghasilan)</small>
+  </div>
+
+  <!-- TESTIMONI -->
+  <div class="testi">
+    ⭐⭐⭐⭐⭐<br>
+    “Simulasinya jelas dan gampang dipahami. Jadi yakin ambil rumah.”
+    <br><strong>— Andi, Tangerang</strong>
+  </div>
+
+  <!-- DISCLAIMER -->
+  <div class="disclaimer">
+    *Hasil simulasi bersifat estimasi. Persetujuan KPR mengikuti kebijakan masing-masing bank.*
+  </div>
   </section>
 </div>
 
@@ -413,6 +462,32 @@ function submitLead(){
       closeLead();
     });
 }
+
+const dpRange = document.getElementById("dpRange");
+const tenorRange = document.getElementById("tenorRange");
+const gajiMin = document.getElementById("gajiMin");
+
+dpRange.addEventListener("input",()=>{
+  dp.value = dpRange.value;
+  dp.dispatchEvent(new Event("input"));
+});
+
+tenorRange.addEventListener("input",()=>{
+  tenor.value = tenorRange.value;
+  tenor.dispatchEvent(new Event("input"));
+});
+
+function updateGaji(){
+  const cicilan = cleanNumber(hasil.textContent.replace("Rp",""));
+  const gaji = cicilan * 3;
+  gajiMin.textContent = "Rp " + formatRupiah(Math.round(gaji));
+}
+
+[harga,dp,tenor,bunga].forEach(el=>{
+  el.addEventListener("input",updateGaji);
+});
+
+updateGaji();
 
 document.getElementById("year").textContent = new Date().getFullYear();
 
