@@ -285,19 +285,16 @@ const SHEET_API = "https://script.google.com/macros/s/AKfycbzRXCwPQP75Su6OhxShHv
 function submitLead(){
   const nama = namaLead.value.trim();
   const waRaw = waLead.value.trim();
-  const wa = normalizeWA(waRaw); // 08xxxx
+  const wa = normalizeWA(waRaw);
   const harga = formatRupiah(cleanNumber(hargaEl.value));
   const cicilan = hasil.textContent;
 
   if(!nama || !wa){
-    alert("Nomor WhatsApp tidak valid");
+    alert("Lengkapi data dulu ya");
     return;
   }
 
-  // Konversi hanya untuk link WA
-  const wa62 = waTo62(wa);
-
-  // 1. Buka WhatsApp (aman & klik)
+  // 1. Buka WhatsApp (tetap aman)
   window.open(
     "https://wa.me/6281802168184?text=" + encodeURIComponent(
       "Halo, saya mau konsultasi KPR\n\n"+
@@ -309,7 +306,7 @@ function submitLead(){
     "_blank"
   );
 
-  // 2. Kirim ke Google Sheet (SIMPAN 08xxxx)
+  // 2. Kirim ke Google Sheet (PASTI MASUK)
   const formData = new FormData();
   formData.append("nama", nama);
   formData.append("wa", wa);
