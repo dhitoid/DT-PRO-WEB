@@ -207,10 +207,74 @@ input.error{
 }
 /* ================== */
 
+/* ===== RANGE SLIDER • MODERN 2026 ===== */
 .range{
+  -webkit-appearance:none;
+  appearance:none;
   width:100%;
-  accent-color:var(--primary);
-  margin-top:8px;
+  height:10px;
+  border-radius:999px;
+  background:linear-gradient(
+    to right,
+    var(--primary) 0%,
+    var(--accent) 50%,
+    rgba(0,0,0,.12) 50%
+  );
+  outline:none;
+  margin-top:10px;
+  transition:background .25s ease;
+}
+
+/* TRACK (iOS / Chrome / Android) */
+.range::-webkit-slider-runnable-track{
+  height:10px;
+  border-radius:999px;
+}
+
+/* THUMB */
+.range::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  appearance:none;
+  width:22px;
+  height:22px;
+  border-radius:50%;
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  box-shadow:
+    0 6px 14px rgba(0,0,0,.25),
+    inset 0 0 0 3px rgba(255,255,255,.7);
+  cursor:pointer;
+  margin-top:-6px;
+  transition:transform .2s ease, box-shadow .2s ease;
+}
+
+/* THUMB ACTIVE */
+.range::-webkit-slider-thumb:active{
+  transform:scale(1.15);
+  box-shadow:
+    0 10px 24px rgba(0,0,0,.35),
+    inset 0 0 0 3px rgba(255,255,255,.9);
+}
+
+/* FIREFOX */
+.range::-moz-range-track{
+  height:10px;
+  border-radius:999px;
+  background:rgba(0,0,0,.12);
+}
+.range::-moz-range-thumb{
+  width:22px;
+  height:22px;
+  border-radius:50%;
+  border:none;
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  box-shadow:0 6px 14px rgba(0,0,0,.25);
+}
+
+/* FOCUS GLOW */
+.range:focus-visible::-webkit-slider-thumb{
+  box-shadow:
+    0 0 0 6px rgba(99,102,241,.25),
+    0 8px 20px rgba(0,0,0,.3);
 }
 
 .info-box{
@@ -254,8 +318,7 @@ input.error{
 
     <div class="field">
       <label>DP (%)</label>
-      <input id="dp" type="number" value="10">
-      <input type="range" min="5" max="100" value="10" class="range" id="dpRange">
+      <input type="range" min="0" max="100" value="10" class="range" id="dpRange">
     </div>
 
     <!-- PROGRESS DP -->
@@ -271,7 +334,6 @@ input.error{
 
     <div class="field">
       <label>Tenor (Tahun)</label>
-      <input id="tenor" type="number" value="20">
       <input type="range" min="5" max="30" value="20" class="range" id="tenorRange">
     </div>
 
