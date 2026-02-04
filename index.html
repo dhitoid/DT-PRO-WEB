@@ -272,37 +272,32 @@ function submitLead(){
     return;
   }
 
-  // 👉 1. LANGSUNG BUKA WA (masih konteks klik user)
+  // 1. Buka WhatsApp (tetap aman)
   window.open(
     "https://wa.me/6281802168184?text=" + encodeURIComponent(
       "Halo, saya mau konsultasi KPR\n\n"+
       "Nama: "+nama+"\n"+
+      "WhatsApp: "+wa+"\n"+
       "Harga Rumah: Rp "+harga+"\n"+
       "Cicilan: "+cicilan
     ),
     "_blank"
   );
 
-  // 👉 2. BARU KIRIM KE GOOGLE SHEET (async, aman)
+  // 2. Kirim ke Google Sheet (PASTI MASUK)
+  const formData = new FormData();
+  formData.append("nama", nama);
+  formData.append("wa", wa);
+  formData.append("harga", harga);
+  formData.append("cicilan", cicilan);
+
   fetch(SHEET_API, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      nama,
-      wa,
-      harga,
-      cicilan
-    })
+    body: formData
   })
-  .then(res => res.json())
-  .then(res => {
-    console.log("SHEET RESPONSE:", res);
-  })
-  .catch(err => {
-    console.error("FETCH ERROR:", err);
-  });
+  .then(res => res.text())
+  .then(res => console.log("SHEET:", res))
+  .catch(err => console.error(err));
 
   closeLead();
 }
