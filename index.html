@@ -17,8 +17,6 @@
   --accent:#22d3ee;
   --border:#e5e7eb;
   --danger:#ef4444;
-  --warning:#f59e0b;
-  --success:#22c55e;
 }
 @media (prefers-color-scheme: dark){
   :root{
@@ -85,8 +83,48 @@ input{
   background:transparent;
   color:var(--text);
   font-size:16px;
+  transition:.25s;
 }
-input.error{border-color:var(--danger)}
+input:focus{
+  outline:none;
+  border-color:var(--primary);
+  box-shadow:0 0 0 4px rgba(99,102,241,.15);
+}
+input.error{
+  border-color:var(--danger);
+  animation:shake .3s;
+}
+
+@keyframes shake{
+  0%,100%{transform:translateX(0)}
+  25%{transform:translateX(-4px)}
+  75%{transform:translateX(4px)}
+}
+
+/* ===== PROGRESS BAR (TAMBAHAN) ===== */
+.progress-wrap{
+  margin:-6px 0 18px;
+}
+.progress-label{
+  display:flex;
+  justify-content:space-between;
+  font-size:12px;
+  color:var(--muted);
+  margin-bottom:6px;
+}
+.progress-bar{
+  height:10px;
+  background:rgba(0,0,0,.08);
+  border-radius:999px;
+  overflow:hidden;
+}
+.progress-fill{
+  height:100%;
+  width:0%;
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  transition:width .35s ease;
+}
+/* ================================= */
 
 .result{
   margin-top:20px;
@@ -97,29 +135,6 @@ input.error{border-color:var(--danger)}
 }
 .result h2{font-size:32px;margin:6px 0 0}
 
-/* PROGRESS */
-.progress-wrap{margin:16px 0}
-.progress-label{
-  display:flex;
-  justify-content:space-between;
-  font-size:13px;
-  color:var(--muted);
-  margin-bottom:6px;
-}
-.progress-bar{
-  height:10px;
-  background:rgba(0,0,0,.1);
-  border-radius:999px;
-  overflow:hidden;
-}
-.progress-fill{
-  height:100%;
-  width:0%;
-  background:var(--primary);
-  transition:.35s ease;
-}
-
-/* CTA */
 .cta{
   position:fixed;
   left:0;right:0;bottom:0;
@@ -135,7 +150,9 @@ input.error{border-color:var(--danger)}
   font-weight:600;
   color:white;
   background:linear-gradient(135deg,var(--primary),var(--accent));
+  transition:.2s;
 }
+.cta button:active{transform:scale(.97)}
 
 .modal{
   position:fixed;
@@ -155,7 +172,14 @@ input.error{border-color:var(--danger)}
   border-radius:24px;
   padding:22px;
   border:1px solid var(--border);
+  animation:pop .3s ease;
 }
+
+@keyframes pop{
+  from{opacity:0;transform:scale(.92)}
+  to{opacity:1;transform:scale(1)}
+}
+
 .modal-card button{
   margin-top:12px;
   width:100%;
@@ -171,61 +195,60 @@ input.error{border-color:var(--danger)}
 
 <body>
 <div class="container">
+  <section class="hero">
+    <div class="hero-badge">Kalkulator KPR • Profesional</div>
+    <h1>Hitung Cicilan Properti<br>Secara Realistis</h1>
+    <p>Simulasi cicilan yang rapi, cepat, dan siap dikonsultasikan.</p>
+  </section>
 
-<section class="hero">
-  <div class="hero-badge">Kalkulator KPR • Profesional</div>
-  <h1>Hitung Cicilan Properti<br>Secara Realistis</h1>
-  <p>Simulasi cicilan modern & siap dikonsultasikan.</p>
-</section>
-
-<section class="card">
-
-  <div class="field">
-    <label>Harga Properti</label>
-    <input id="harga" value="500.000.000">
-  </div>
-
-  <div class="field">
-    <label>DP (%)</label>
-    <input id="dp" type="number" value="10">
-  </div>
-
-  <div class="progress-wrap">
-    <div class="progress-label">
-      <span>DP</span>
-      <strong><span id="dpVal">10</span>%</strong>
+  <section class="card">
+    <div class="field">
+      <label>Harga Properti</label>
+      <input id="harga" value="500.000.000">
     </div>
-    <div class="progress-bar">
-      <div class="progress-fill" id="dpBar"></div>
+
+    <div class="field">
+      <label>DP (%)</label>
+      <input id="dp" type="number" value="10">
     </div>
-  </div>
 
-  <div class="field">
-    <label>Tenor (Tahun)</label>
-    <input id="tenor" type="number" value="20">
-  </div>
-
-  <div class="progress-wrap">
-    <div class="progress-label">
-      <span>Tenor</span>
-      <strong><span id="tenorVal">20</span> Tahun</strong>
+    <!-- PROGRESS DP -->
+    <div class="progress-wrap">
+      <div class="progress-label">
+        <span>DP</span>
+        <strong><span id="dpVal">10</span>%</strong>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="dpBar"></div>
+      </div>
     </div>
-    <div class="progress-bar">
-      <div class="progress-fill" id="tenorBar"></div>
+
+    <div class="field">
+      <label>Tenor (Tahun)</label>
+      <input id="tenor" type="number" value="20">
     </div>
-  </div>
 
-  <div class="field">
-    <label>Bunga (% / tahun)</label>
-    <input id="bunga" type="number" value="8">
-  </div>
+    <!-- PROGRESS TENOR -->
+    <div class="progress-wrap">
+      <div class="progress-label">
+        <span>Tenor</span>
+        <strong><span id="tenorVal">20</span> tahun</strong>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="tenorBar"></div>
+      </div>
+    </div>
 
-  <div class="result">
-    <small>Perkiraan Cicilan / bulan</small>
-    <h2 id="hasil">Rp 0</h2>
-  </div>
-</section>
+    <div class="field">
+      <label>Bunga (% / tahun)</label>
+      <input id="bunga" type="number" value="8">
+    </div>
 
+    <div class="result">
+      <small>Perkiraan Cicilan / bulan</small>
+      <h2 id="hasil">Rp 0</h2>
+    </div>
+  </section>
 </div>
 
 <div class="cta">
@@ -248,80 +271,124 @@ input.error{border-color:var(--danger)}
 </div>
 
 <script>
-function formatRupiah(n){return n.toLocaleString("id-ID")}
-function cleanNumber(v){return parseInt(v.replace(/\./g,""))||0}
+/* FORMAT ANGKA */
+function formatRupiah(n){
+  return n.toLocaleString("id-ID");
+}
+function cleanNumber(v){
+  return parseInt(v.replace(/\./g,"")) || 0;
+}
 
-const hargaEl=document.getElementById("harga");
-const dpEl=document.getElementById("dp");
-const tenorEl=document.getElementById("tenor");
-const bungaEl=document.getElementById("bunga");
-const hasil=document.getElementById("hasil");
+const hargaEl = document.getElementById("harga");
+const dpEl = document.getElementById("dp");
+const tenorEl = document.getElementById("tenor");
+const bungaEl = document.getElementById("bunga");
+const hasil = document.getElementById("hasil");
 
-const dpBar=document.getElementById("dpBar");
-const tenorBar=document.getElementById("tenorBar");
-const dpVal=document.getElementById("dpVal");
-const tenorVal=document.getElementById("tenorVal");
+/* ===== PROGRESS ELEMENT ===== */
+const dpBar = document.getElementById("dpBar");
+const tenorBar = document.getElementById("tenorBar");
+const dpVal = document.getElementById("dpVal");
+const tenorVal = document.getElementById("tenorVal");
 
+/* INPUT FORMAT */
 hargaEl.addEventListener("input",()=>{
-  hargaEl.value=formatRupiah(cleanNumber(hargaEl.value));
+  const num = cleanNumber(hargaEl.value);
+  hargaEl.value = formatRupiah(num);
   hitung();
 });
 
-function updateProgress(){
-  const dp=Math.min(dpEl.value,50);
-  dpVal.textContent=dp;
-  dpBar.style.width=(dp*2)+"%";
-  dpBar.style.background=dp<15?"var(--danger)":dp<25?"var(--warning)":"var(--success)";
-
-  const tenor=Math.min(tenorEl.value,30);
-  tenorVal.textContent=tenor;
-  tenorBar.style.width=(tenor/30*100)+"%";
-}
-
+/* HITUNG CICILAN */
 function hitung(){
-  const harga=cleanNumber(hargaEl.value);
-  const dp=harga*(dpEl.value/100);
-  const pokok=harga-dp;
-  const bulan=tenorEl.value*12;
-  const bunga=(bungaEl.value/100)/12;
-  const cicilan=pokok*bunga/(1-Math.pow(1+bunga,-bulan));
-  hasil.textContent="Rp "+formatRupiah(Math.round(cicilan));
-  updateProgress();
+  const harga = cleanNumber(hargaEl.value);
+  const dp = harga * (dpEl.value/100);
+  const pokok = harga - dp;
+  const bulan = tenorEl.value * 12;
+  const bunga = (bungaEl.value/100)/12;
+
+  const cicilan = pokok * bunga / (1 - Math.pow(1+bunga, -bulan));
+  hasil.textContent = "Rp " + formatRupiah(Math.round(cicilan));
 }
 
-[hargaEl,dpEl,tenorEl,bungaEl].forEach(el=>el.addEventListener("input",hitung));
+/* ===== UPDATE PROGRESS (TAMBAHAN) ===== */
+function updateProgress(){
+  const dp = Math.min(dpEl.value,50);
+  dpBar.style.width = (dp * 2) + "%";
+  dpVal.textContent = dp;
+
+  const tenor = Math.min(tenorEl.value,30);
+  tenorBar.style.width = (tenor/30*100) + "%";
+  tenorVal.textContent = tenor;
+}
+
+[hargaEl,dpEl,tenorEl,bungaEl].forEach(el=>{
+  el.addEventListener("input",()=>{
+    hitung();
+    updateProgress();
+  });
+});
+
 hitung();
+updateProgress();
 
+/* ===== MODAL ===== */
 function openLead(){leadModal.classList.add("active")}
-function closeLead(e){if(!e||e.target===leadModal)leadModal.classList.remove("active")}
+function closeLead(e){
+  if(!e || e.target===leadModal) leadModal.classList.remove("active");
+}
 
+/* ===== WA NORMALIZE ===== */
 function normalizeWA(input){
-  let wa=input.replace(/\D/g,"");
-  if(wa.startsWith("62")) wa="0"+wa.slice(2);
-  if(!wa.startsWith("0")||wa.length<10||wa.length>15) return null;
+  let wa = input.replace(/\D/g, "");
+  if(wa.startsWith("62")) wa = "0"+wa.slice(2);
+  if(!wa.startsWith("0")) return null;
+  if(wa.length < 10 || wa.length > 15) return null;
   return wa;
 }
 
-const SHEET_API="https://script.google.com/macros/s/AKfycbw5Ghfnu_J0_mVKsN5eUThmyZWU91zTs9ISOwqjP2szC2KHkBjBJWv7Ff0SygIAqhbA/exec";
+const SHEET_API = "https://script.google.com/macros/s/AKfycbw5Ghfnu_J0_mVKsN5eUThmyZWU91zTs9ISOwqjP2szC2KHkBjBJWv7Ff0SygIAqhbA/exec";
 
 function submitLead(){
-  const nama=namaLead.value.trim();
-  const wa=normalizeWA(waLead.value.trim());
-  namaLead.classList.toggle("error",!nama);
-  waLead.classList.toggle("error",!wa);
-  if(!nama||!wa) return alert("Nama & WhatsApp wajib diisi");
+  const nama = namaLead.value.trim();
+  const waRaw = waLead.value.trim();
+  const wa = normalizeWA(waRaw);
+  const harga = formatRupiah(cleanNumber(hargaEl.value));
+  const cicilan = hasil.textContent;
 
-  window.open("https://wa.me/6281802168184?text="+encodeURIComponent(
-    `Halo, saya mau konsultasi KPR\n\nNama: ${nama}\nWhatsApp: ${wa}\nHarga: Rp ${hargaEl.value}\nCicilan: ${hasil.textContent}`
-  ),"_blank");
+  namaLead.classList.toggle("error", !nama);
+  waLead.classList.toggle("error", !wa);
 
-  const fd=new FormData();
-  fd.append("nama",nama);
-  fd.append("wa",wa);
-  fd.append("harga",hargaEl.value);
-  fd.append("cicilan",hasil.textContent);
-  fetch(SHEET_API,{method:"POST",body:fd});
-  closeLead();
+  if(!nama || !wa){
+    alert("Nama & WhatsApp wajib diisi dengan benar");
+    return;
+  }
+
+  submitBtn.textContent="Mengirim...";
+  submitBtn.disabled=true;
+
+  window.open(
+    "https://wa.me/6281802168184?text=" + encodeURIComponent(
+      "Halo, saya mau konsultasi KPR\n\n"+
+      "Nama: "+nama+"\n"+
+      "WhatsApp: "+wa+"\n"+
+      "Harga Rumah: Rp "+harga+"\n"+
+      "Cicilan: "+cicilan
+    ),
+    "_blank"
+  );
+
+  const formData = new FormData();
+  formData.append("nama", nama);
+  formData.append("wa", wa);
+  formData.append("harga", harga);
+  formData.append("cicilan", cicilan);
+
+  fetch(SHEET_API,{method:"POST",body:formData})
+    .finally(()=>{
+      submitBtn.textContent="Kirim ke WhatsApp";
+      submitBtn.disabled=false;
+      closeLead();
+    });
 }
 </script>
 </body>
