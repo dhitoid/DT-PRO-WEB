@@ -16,6 +16,7 @@
   --primary:#6366f1;
   --accent:#22d3ee;
   --border:#e5e7eb;
+  --danger:#ef4444;
 }
 @media (prefers-color-scheme: dark){
   :root{
@@ -60,14 +61,11 @@ body{
   line-height:1.2;
   margin-bottom:12px;
 }
-.hero p{
-  color:var(--muted);
-  margin-bottom:28px;
-}
+.hero p{color:var(--muted);margin-bottom:28px}
 
 .card{
   background:var(--card);
-  backdrop-filter: blur(14px);
+  backdrop-filter: blur(16px);
   border:1px solid var(--border);
   border-radius:24px;
   padding:22px;
@@ -85,6 +83,22 @@ input{
   background:transparent;
   color:var(--text);
   font-size:16px;
+  transition:.25s;
+}
+input:focus{
+  outline:none;
+  border-color:var(--primary);
+  box-shadow:0 0 0 4px rgba(99,102,241,.15);
+}
+input.error{
+  border-color:var(--danger);
+  animation:shake .3s;
+}
+
+@keyframes shake{
+  0%,100%{transform:translateX(0)}
+  25%{transform:translateX(-4px)}
+  75%{transform:translateX(4px)}
 }
 
 .result{
@@ -94,10 +108,7 @@ input{
   background:linear-gradient(135deg,var(--primary),var(--accent));
   color:white;
 }
-.result h2{
-  font-size:32px;
-  margin:6px 0 0;
-}
+.result h2{font-size:32px;margin:6px 0 0}
 
 .cta{
   position:fixed;
@@ -114,9 +125,10 @@ input{
   font-weight:600;
   color:white;
   background:linear-gradient(135deg,var(--primary),var(--accent));
+  transition:.2s;
 }
+.cta button:active{transform:scale(.97)}
 
-/* MODAL */
 .modal{
   position:fixed;
   inset:0;
@@ -135,18 +147,13 @@ input{
   border-radius:24px;
   padding:22px;
   border:1px solid var(--border);
-  position:relative;
+  animation:pop .3s ease;
 }
-.modal-close{
-  position:absolute;
-  top:12px;
-  right:12px;
-  border:none;
-  background:none;
-  font-size:20px;
-  cursor:pointer;
-  color:var(--muted);
+@keyframes pop{
+  from{opacity:0;transform:scale(.92)}
+  to{opacity:1;transform:scale(1)}
 }
+
 .modal-card button{
   margin-top:12px;
   width:100%;
@@ -157,42 +164,55 @@ input{
   color:white;
   background:linear-gradient(135deg,var(--primary),var(--accent));
 }
+
+.toast{
+  position:fixed;
+  bottom:100px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#0f172a;
+  color:white;
+  padding:12px 18px;
+  border-radius:14px;
+  opacity:0;
+  pointer-events:none;
+  transition:.3s;
+}
+.toast.show{opacity:1}
 </style>
 </head>
 
 <body>
 <div class="container">
+  <section class="hero">
+    <div class="hero-badge">Kalkulator KPR • Profesional</div>
+    <h1>Hitung Cicilan Properti<br>Secara Realistis</h1>
+    <p>Simulasi cicilan yang rapi, cepat, dan siap dikonsultasikan.</p>
+  </section>
 
-<section class="hero">
-  <div class="hero-badge">Kalkulator KPR • Versi Profesional</div>
-  <h1>Hitung Cicilan Rumah<br>Secara Realistis</h1>
-  <p>Kalkulator modern dengan simulasi DP & strategi cicilan terbaik.</p>
-</section>
+  <section class="card">
+    <div class="field">
+      <label>Harga Properti</label>
+      <input id="harga" value="500.000.000">
+    </div>
+    <div class="field">
+      <label>DP (%)</label>
+      <input id="dp" type="number" value="10">
+    </div>
+    <div class="field">
+      <label>Tenor (Tahun)</label>
+      <input id="tenor" type="number" value="20">
+    </div>
+    <div class="field">
+      <label>Bunga (% / tahun)</label>
+      <input id="bunga" type="number" value="8">
+    </div>
 
-<section class="card">
-  <div class="field">
-    <label>Harga Rumah</label>
-    <input id="harga" inputmode="numeric" value="500.000.000">
-  </div>
-  <div class="field">
-    <label>DP (%)</label>
-    <input id="dp" type="number" value="10">
-  </div>
-  <div class="field">
-    <label>Tenor (Tahun)</label>
-    <input id="tenor" type="number" value="20">
-  </div>
-  <div class="field">
-    <label>Bunga (% / tahun)</label>
-    <input id="bunga" type="number" value="8">
-  </div>
-
-  <div class="result">
-    <small>Perkiraan Cicilan / bulan</small>
-    <h2 id="hasil">Rp 0</h2>
-  </div>
-</section>
-
+    <div class="result">
+      <small>Perkiraan Cicilan / bulan</small>
+      <h2 id="hasil">Rp 0</h2>
+    </div>
+  </section>
 </div>
 
 <div class="cta">
@@ -201,9 +221,7 @@ input{
 
 <div class="modal" id="leadModal" onclick="closeLead(event)">
   <div class="modal-card">
-    <button class="modal-close" onclick="closeLead()">✕</button>
     <h3>Dapatkan Hasil Lengkap</h3>
-
     <div class="field">
       <label>Nama</label>
       <input id="namaLead">
@@ -212,10 +230,11 @@ input{
       <label>WhatsApp</label>
       <input id="waLead">
     </div>
-
-    <button onclick="submitLead()">Kirim ke WhatsApp</button>
+    <button id="submitBtn" onclick="submitLead()">Kirim ke WhatsApp</button>
   </div>
 </div>
+
+<div class="toast" id="toast">Data berhasil dikirim</div>
 
 <script>
 /* FORMAT ANGKA */
@@ -289,12 +308,22 @@ function submitLead(){
   const harga = formatRupiah(cleanNumber(hargaEl.value));
   const cicilan = hasil.textContent;
 
+  // validasi UI
+  namaLead.classList.toggle("error", !nama);
+  waLead.classList.toggle("error", !wa);
+
   if(!nama || !wa){
-    alert("Lengkapi data dulu ya");
+    alert("Nama & WhatsApp wajib diisi dengan benar");
     return;
   }
 
-  // 1. Buka WhatsApp (tetap aman)
+  // lock button
+  submitBtn.textContent = "Mengirim...";
+  submitBtn.disabled = true;
+
+  /* ===============================
+     1. BUKA WHATSAPP (FREE)
+  =============================== */
   window.open(
     "https://wa.me/6281802168184?text=" + encodeURIComponent(
       "Halo, saya mau konsultasi KPR\n\n"+
@@ -306,22 +335,25 @@ function submitLead(){
     "_blank"
   );
 
-  // 2. Kirim ke Google Sheet (PASTI MASUK)
+  /* ===============================
+     2. SIMPAN KE GOOGLE SHEET
+  =============================== */
   const formData = new FormData();
   formData.append("nama", nama);
   formData.append("wa", wa);
   formData.append("harga", harga);
   formData.append("cicilan", cicilan);
 
-  fetch(SHEET_API, {
-    method: "POST",
-    body: formData
+  fetch(SHEET_API,{
+    method:"POST",
+    body:formData
   })
-  .then(res => res.text())
-  .then(res => console.log("SHEET:", res))
-  .catch(err => console.error(err));
-
-  closeLead();
+  .catch(err=>console.error(err))
+  .finally(()=>{
+    submitBtn.textContent="Kirim ke WhatsApp";
+    submitBtn.disabled=false;
+    closeLead();
+  });
 }
 </script>
 </body>
