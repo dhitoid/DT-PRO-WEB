@@ -259,11 +259,29 @@ function closeLead(e){
   if(!e || e.target===leadModal) leadModal.classList.remove("active");
 }
 
+function normalizeWA(input){
+  let wa = input.replace(/\D/g, "");
+  if(wa.startsWith("0")){
+    wa = "62" + wa.slice(1);
+  }
+
+  if(!wa.startsWith("62")){
+    return null;
+  }
+
+  if(wa.length < 10 || wa.length > 15){
+    return null;
+  }
+
+  return wa;
+}
+
 const SHEET_API = "https://script.google.com/macros/s/AKfycbzRXCwPQP75Su6OhxShHvZdt4EIBYC8h8t2YVBaZwE6XvbqNuFTmgMoXTzAmzUJ1AqG/exec";
 
 function submitLead(){
   const nama = namaLead.value.trim();
-  const wa = waLead.value.trim();
+  const waRaw = waLead.value.trim();
+  const wa = normalizeWA(waRaw);
   const harga = formatRupiah(cleanNumber(hargaEl.value));
   const cicilan = hasil.textContent;
 
