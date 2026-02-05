@@ -306,24 +306,37 @@ input.error{
 
 /* ITEM */
 .testi-item{
-  position:absolute;
-  inset:0;
-  opacity:0;
-  transform:translateY(14px);
-  transition:
-    opacity .6s ease,
-    transform .6s cubic-bezier(.4,0,.2,1);
-  text-align:center;
-  font-size:13.5px;
-  line-height:1.6;
-  color:#eaeaea;
-  padding:4px;
+  min-width:260px;
+  padding:18px;
+  border-radius:18px;
+  background:rgba(255,255,255,.08);
+  transition:.35s cubic-bezier(.4,0,.2,1);
+  opacity:.45;
+  transform:scale(.94);
+  backdrop-filter:blur(14px);
 }
 
+/* TESTI AKTIF */
 .testi-item.active{
   opacity:1;
-  transform:translateY(0);
-  position:relative;
+  transform:scale(1);
+  box-shadow:0 14px 34px rgba(0,0,0,.28);
+}
+
+/* WARNA HALUS SESUAI STATUS */
+.testi-item.active[data-status="ok"]{
+  box-shadow:0 0 0 1px rgba(46,204,113,.4),
+             0 18px 36px rgba(46,204,113,.25);
+}
+
+.testi-item.active[data-status="warn"]{
+  box-shadow:0 0 0 1px rgba(241,196,15,.4),
+             0 18px 36px rgba(241,196,15,.25);
+}
+
+.testi-item.active[data-status="bad"]{
+  box-shadow:0 0 0 1px rgba(231,76,60,.4),
+             0 18px 36px rgba(231,76,60,.25);
 }
 
 /* STAR */
