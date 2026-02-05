@@ -357,6 +357,18 @@ input.error{
       <h2 id="hasil">Rp 0</h2>
     </div>
     
+    <div class="info-box">
+  🏦 Simulasi Bank:
+  <br><br>
+
+  <strong>FIX (3 Tahun)</strong><br>
+  Cicilan: <strong id="fixCicilan">Rp 0</strong>
+  <br><br>
+
+  <strong>Floating</strong><br>
+  Cicilan: <strong id="floatCicilan">Rp 0</strong>
+</div>
+    
     <!-- ESTIMASI GAJI -->
   <div class="info-box">
     💼 Estimasi gaji minimal agar aman:
@@ -445,6 +457,32 @@ function hitung(){
   updateGaji();
 }
 
+const fixCicilanEl = document.getElementById("fixCicilan");
+const floatCicilanEl = document.getElementById("floatCicilan");
+
+function hitungBank(){
+  const harga = cleanNumber(hargaEl.value);
+  const dp = harga * (dpEl.value/100);
+  const pokok = harga - dp;
+  const bulan = tenorEl.value * 12;
+
+  // skenario bank
+  const bungaFix = 0.07 / 12;      // 7% fix
+  const bungaFloat = 0.11 / 12;    // 11% floating
+
+  const cicilanFix =
+    pokok * bungaFix / (1 - Math.pow(1+bungaFix, -bulan));
+
+  const cicilanFloat =
+    pokok * bungaFloat / (1 - Math.pow(1+bungaFloat, -bulan));
+
+  fixCicilanEl.textContent =
+    "Rp " + formatRupiah(Math.round(cicilanFix));
+
+  floatCicilanEl.textContent =
+    "Rp " + formatRupiah(Math.round(cicilanFloat));
+}
+
 /* ===== UPDATE PROGRESS (TAMBAHAN) ===== */
 function updateProgress(){
   const dp = Math.min(dpEl.value,100);
@@ -460,9 +498,12 @@ function updateProgress(){
   el.addEventListener("input",()=>{
     hitung();
     updateProgress();
+    hitungBank();   // 👈 TAMBAHAN
+    updateGaji();
   });
 });
 
+hitungBank();
 hitung();
 updateProgress();
 
