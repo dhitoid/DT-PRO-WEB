@@ -284,12 +284,83 @@ input.error{
   font-size:13px;
 }
 
-.testi{
-  margin-top:18px;
-  padding:16px;
-  border-radius:16px;
-  background:rgba(0,0,0,.05);
-  font-size:13px;
+/* ===============================
+   TESTIMONI PRO 2026
+================================ */
+.testi-card{
+  margin-top:22px;
+  padding:18px;
+  border-radius:22px;
+  background:rgba(255,255,255,.08);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  box-shadow:0 20px 40px rgba(0,0,0,.12);
+  position:relative;
+  overflow:hidden;
+}
+
+.testi-slider{
+  position:relative;
+  min-height:110px;
+}
+
+/* ITEM */
+.testi-item{
+  position:absolute;
+  inset:0;
+  opacity:0;
+  transform:translateY(14px);
+  transition:
+    opacity .6s ease,
+    transform .6s cubic-bezier(.4,0,.2,1);
+  text-align:center;
+  font-size:13.5px;
+  line-height:1.6;
+  color:#eaeaea;
+  padding:4px;
+}
+
+.testi-item.active{
+  opacity:1;
+  transform:translateY(0);
+  position:relative;
+}
+
+/* STAR */
+.testi-item .stars{
+  font-size:14px;
+  margin-bottom:6px;
+  letter-spacing:1px;
+}
+
+/* NAME */
+.testi-item strong{
+  display:block;
+  margin-top:6px;
+  font-weight:600;
+  opacity:.85;
+}
+
+/* DOTS */
+.testi-dots{
+  display:flex;
+  justify-content:center;
+  gap:6px;
+  margin-top:12px;
+}
+
+.testi-dots span{
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  background:rgba(255,255,255,.3);
+  transition:.3s;
+}
+
+.testi-dots span.active{
+  width:18px;
+  border-radius:10px;
+  background:#2ecc71;
 }
 
 .disclaimer{
@@ -783,12 +854,32 @@ input.error{
   </div>
 </div>
 
-  <!-- TESTIMONI -->
-  <div class="testi">
-    ⭐⭐⭐⭐⭐<br>
-    “Simulasinya jelas dan gampang dipahami. Jadi yakin ambil rumah.”
-    <br><strong>— Andi, Tangerang</strong>
+<!-- TESTIMONI -->
+<div class="testi-card">
+  <div class="testi-slider" id="testiSlider">
+    
+    <div class="testi-item active">
+      <div class="stars">⭐⭐⭐⭐⭐</div>
+      <p>Simulasinya jelas dan gampang dipahami. Jadi yakin ambil rumah.</p>
+      <strong>— Andi, Tangerang</strong>
+    </div>
+
+    <div class="testi-item">
+      <div class="stars">⭐⭐⭐⭐⭐</div>
+      <p>Kalkulator ini beda, real time dan keliatan aman atau nggaknya.</p>
+      <strong>— Rina & Suami, Depok</strong>
+    </div>
+
+    <div class="testi-item">
+      <div class="stars">⭐⭐⭐⭐⭐</div>
+      <p>Baru kali ini simulasi KPR yang jujur soal risiko cicilan.</p>
+      <strong>— Fajar, Bekasi</strong>
+    </div>
+
   </div>
+
+  <div class="testi-dots" id="testiDots"></div>
+</div>
 
   <!-- DISCLAIMER -->
   <div class="disclaimer">
@@ -869,6 +960,8 @@ const statusBox = document.getElementById("statusBox");
 const savedListEl = document.getElementById("savedList");
 const smartAdviceEl = document.getElementById("smartAdvice");
 const unitMatchEl = document.getElementById("unitMatch");
+const testiItems = document.querySelectorAll(".testi-item");
+const testiDots = document.getElementById("testiDots");
 
 /* =========================================================
    INIT DEFAULT VALUE (WAJIB)
@@ -1306,6 +1399,36 @@ function generateUnitMatch(){
     `;
   }
 }
+
+/* ===============================
+   TESTIMONI SLIDER
+================================ */
+let testiIndex = 0;
+
+/* CREATE DOT */
+testiItems.forEach((_,i)=>{
+  const dot = document.createElement("span");
+  if(i===0) dot.classList.add("active");
+  dot.onclick = ()=>showTesti(i);
+  testiDots.appendChild(dot);
+});
+
+function showTesti(i){
+  testiItems[testiIndex].classList.remove("active");
+  testiDots.children[testiIndex].classList.remove("active");
+
+  testiIndex = i;
+
+  testiItems[testiIndex].classList.add("active");
+  testiDots.children[testiIndex].classList.add("active");
+}
+
+/* AUTO PLAY */
+setInterval(()=>{
+  let next = testiIndex + 1;
+  if(next >= testiItems.length) next = 0;
+  showTesti(next);
+}, 4200);
 
 /* =========================================================
    INIT
