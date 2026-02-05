@@ -517,6 +517,23 @@ hargaEl.addEventListener("input",()=>{
   hitung();
 });
 
+const coupleToggle = document.getElementById("coupleToggle");
+const coupleInput = document.getElementById("coupleInput");
+const gajiSuamiEl = document.getElementById("gajiSuami");
+const gajiIstriEl = document.getElementById("gajiIstri");
+
+coupleToggle.addEventListener("change",()=>{
+  coupleInput.classList.toggle("show", coupleToggle.checked);
+  updateGaji();
+});
+
+[gajiSuamiEl, gajiIstriEl].forEach(el=>{
+  el.addEventListener("input",()=>{
+    el.value = formatRupiah(cleanNumber(el.value));
+    updateGaji();
+  });
+});
+
 const gajiMin = document.getElementById("gajiMin");
 
 function updateGaji(){
@@ -547,23 +564,6 @@ function updateGaji(){
 
 [hargaEl, dpEl, tenorEl, bungaEl].forEach(el=>{
   el.addEventListener("input", updateGaji);
-});
-
-const coupleToggle = document.getElementById("coupleToggle");
-const coupleInput = document.getElementById("coupleInput");
-const gajiSuamiEl = document.getElementById("gajiSuami");
-const gajiIstriEl = document.getElementById("gajiIstri");
-
-coupleToggle.addEventListener("change",()=>{
-  coupleInput.classList.toggle("show", coupleToggle.checked);
-  updateGaji();
-});
-
-[gajiSuamiEl, gajiIstriEl].forEach(el=>{
-  el.addEventListener("input",()=>{
-    el.value = formatRupiah(cleanNumber(el.value));
-    updateGaji();
-  });
 });
 
 /* HITUNG CICILAN */
