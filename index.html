@@ -577,7 +577,7 @@ function updateGaji(){
   gajiMin.textContent = "Rp " + formatRupiah(Math.round(gaji));
 }
 
-[hargaEl,dpEl,tenorEl,bungaEl].forEach(el=>{
+[harga,dp,tenor,bunga].forEach(el=>{
   el.addEventListener("input",updateGaji);
 });
 
