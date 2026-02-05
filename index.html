@@ -353,6 +353,77 @@ input.error{
   transform:translateX(20px);
 }
 
+/* ===== STATUS ANIMASI 2026 ===== */
+.status{
+  margin-top:14px;
+  padding:14px 16px;
+  border-radius:14px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:600;
+  font-size:15px;
+  backdrop-filter: blur(14px);
+  transition:.35s cubic-bezier(.4,0,.2,1);
+  transform:scale(.96);
+  opacity:0;
+}
+
+.status.show{
+  opacity:1;
+  transform:scale(1);
+}
+
+/* ICON */
+.status .icon{
+  width:22px;
+  height:22px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:18px;
+}
+
+/* ===== STATE ===== */
+.status.idle{
+  background:rgba(255,255,255,.08);
+  color:#aaa;
+}
+
+.status.ok{
+  background:rgba(46,204,113,.18);
+  color:#2ecc71;
+  box-shadow:0 0 22px rgba(46,204,113,.25);
+}
+
+.status.warn{
+  background:rgba(241,196,15,.18);
+  color:#f1c40f;
+  box-shadow:0 0 20px rgba(241,196,15,.25);
+  animation:pulse 1.8s infinite;
+}
+
+.status.bad{
+  background:rgba(231,76,60,.18);
+  color:#e74c3c;
+  box-shadow:0 0 20px rgba(231,76,60,.25);
+  animation:shake .35s;
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes pulse{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.03)}
+}
+
+@keyframes shake{
+  0%{transform:translateX(0)}
+  25%{transform:translateX(-3px)}
+  50%{transform:translateX(3px)}
+  75%{transform:translateX(-2px)}
+  100%{transform:translateX(0)}
+}
+
 </style>
 </head>
 
@@ -430,6 +501,11 @@ input.error{
     <strong id="gajiMin">Rp 0</strong>
     <br><small>(maks. 30% dari penghasilan)</small>
   </div>
+  
+  <div id="statusBox" class="status idle">
+  <span class="icon"></span>
+  <span class="text">Masukkan data gaji</span>
+</div>
   
   <div class="couple-box">
   <label class="switch">
@@ -530,6 +606,7 @@ const leadModal = document.getElementById("leadModal");
 const namaLead = document.getElementById("namaLead");
 const waLead = document.getElementById("waLead");
 const submitBtn = document.getElementById("submitBtn");
+const statusBox = document.getElementById("statusBox");
 
 /* =========================================================
    INIT DEFAULT VALUE (WAJIB)
@@ -598,34 +675,47 @@ function hitungBank(){
 /* =========================================================
    CEK RASIO GAJI
 ========================================================= */
+
+function setStatus(type, text, icon){
+  statusBox.className = "status " + type + " show";
+  statusBox.querySelector(".text").textContent = text;
+  statusBox.querySelector(".icon").textContent = icon;
+}
+
 function updateGaji(){
-  // pastikan cicilan ada
   hitung();
 
   const cicilan = getCicilan();
   if(!cicilan){
-    gajiMinEl.textContent = "Rp 0";
+    setStatus("idle","Masukkan data cicilan","💼");
     return;
   }
 
-  // gaji minimal = cicilan / 30%
   const gajiMinimal = Math.ceil(cicilan / 0.3);
-  gajiMinEl.textContent =
-    "Rp " + formatRupiah(gajiMinimal);
+  gajiMinEl.textContent = "Rp " + formatRupiah(gajiMinimal);
 
-  // kalau mode pasangan aktif → validasi input
-  if(coupleToggle.checked){
-    const totalGaji =
-      cleanNumber(gajiSuamiEl.value) +
-      cleanNumber(gajiIstriEl.value);
+  if(!coupleToggle.checked){
+    setStatus("idle","Aktifkan & isi gaji pasangan","👨‍👩‍👧");
+    return;
+  }
 
-    if(totalGaji){
-      gajiMinEl.textContent =
-        "Rp " + formatRupiah(gajiMinimal) +
-        (totalGaji >= gajiMinimal
-          ? " ✅ Aman"
-          : " ⚠️ Kurang");
-    }
+  const totalGaji =
+    cleanNumber(gajiSuamiEl.value) +
+    cleanNumber(gajiIstriEl.value);
+
+  if(!totalGaji){
+    setStatus("idle","Masukkan gaji pasangan","💰");
+    return;
+  }
+
+  const rasio = cicilan / totalGaji;
+
+  if(rasio <= 0.3){
+    setStatus("ok","Aman • Rasio cicilan sehat","✅");
+  }else if(rasio <= 0.4){
+    setStatus("warn","Kurang aman • Perlu pertimbangan","⚠️");
+  }else{
+    setStatus("bad","Berat • Risiko tinggi","❌");
   }
 }
 
