@@ -443,6 +443,20 @@ hargaEl.addEventListener("input",()=>{
   hitung();
 });
 
+const gajiMin = document.getElementById("gajiMin");
+
+function updateGaji(){
+  const cicilan = cleanNumber(
+    hasil.textContent.replace("Rp","").trim()
+  );
+  const gaji = cicilan * 3; // 30% rule
+  gajiMin.textContent = "Rp " + formatRupiah(Math.round(gaji));
+}
+
+[hargaEl, dpEl, tenorEl, bungaEl].forEach(el=>{
+  el.addEventListener("input", updateGaji);
+});
+
 /* HITUNG CICILAN */
 function hitung(){
   const harga = cleanNumber(hargaEl.value);
@@ -566,20 +580,6 @@ function submitLead(){
       closeLead();
     });
 }
-
-const gajiMin = document.getElementById("gajiMin");
-
-function updateGaji(){
-  const cicilan = cleanNumber(
-    hasil.textContent.replace("Rp","").trim()
-  );
-  const gaji = cicilan * 3; // 30% rule
-  gajiMin.textContent = "Rp " + formatRupiah(Math.round(gaji));
-}
-
-[hargaEl, dpEl, tenorEl, bungaEl].forEach(el=>{
-  el.addEventListener("input", updateGaji);
-});
 
 document.getElementById("year").textContent = new Date().getFullYear();
 
