@@ -1127,16 +1127,6 @@ function updateDots(index){
   });
 }
 
-function renderTestiDots(){
-  testiDots.innerHTML = "";
-  testiItems.forEach((_,i)=>{
-    const dot = document.createElement("span");
-    if(i === 0) dot.classList.add("active");
-    testiDots.appendChild(dot);
-  });
-}
-renderTestiDots();
-
 function setStatus(type, text, icon){
   statusBox.className = "status " + type + " show";
   statusBox.querySelector(".text").textContent = text;
