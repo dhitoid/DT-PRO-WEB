@@ -410,6 +410,79 @@ input.error{
   animation:shake .35s;
 }
 
+/* ===== FINANCE CARD PRO ===== */
+.finance-card.pro{
+  margin-top:20px;
+  padding:18px;
+  border-radius:22px;
+  background:
+    linear-gradient(135deg,
+      rgba(99,102,241,.18),
+      rgba(34,211,238,.08)
+    );
+  border:1px solid rgba(99,102,241,.35);
+  box-shadow:
+    0 20px 40px rgba(0,0,0,.12),
+    inset 0 0 0 1px rgba(255,255,255,.06);
+  backdrop-filter: blur(20px);
+}
+
+.finance-head{
+  font-size:13px;
+  font-weight:700;
+  color:var(--muted);
+  margin-bottom:12px;
+}
+
+.finance-main{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+.finance-amount strong{
+  font-size:26px;
+}
+
+.finance-amount small{
+  font-size:11px;
+  color:var(--muted);
+}
+
+/* ===== PROGRESS ===== */
+.finance-progress .progress-label{
+  display:flex;
+  justify-content:space-between;
+  font-size:12px;
+  color:var(--muted);
+  margin-bottom:6px;
+}
+
+.progress-bar.soft{
+  height:10px;
+  border-radius:999px;
+  background:rgba(255,255,255,.18);
+  overflow:hidden;
+}
+
+.progress-bar.soft .progress-fill{
+  height:100%;
+  width:0%;
+  border-radius:999px;
+  transition:width .6s cubic-bezier(.4,0,.2,1),
+             background .4s ease;
+}
+
+.progress-fill.safe{
+  background:linear-gradient(90deg,#22c55e,#4ade80);
+}
+.progress-fill.warn{
+  background:linear-gradient(90deg,#facc15,#fde047);
+}
+.progress-fill.danger{
+  background:linear-gradient(90deg,#ef4444,#fb7185);
+}
+
 /* ===== ANIMATIONS ===== */
 @keyframes pulse{
   0%,100%{transform:scale(1)}
@@ -657,17 +730,36 @@ input.error{
   Cicilan: <strong id="floatCicilan">Rp 0</strong>
 </div>
     
-    <!-- ESTIMASI GAJI -->
-  <div class="info-box">
-    💼 Estimasi gaji minimal agar aman:
-    <strong id="gajiMin">Rp 0</strong>
-    <br><small>(maks. 30% dari penghasilan)</small>
+<!-- FINANCE CARD PRO -->
+<div class="finance-card pro">
+
+  <div class="finance-head">
+    💼 Analisa Keuangan Anda
   </div>
-  
-  <div id="statusBox" class="status idle">
-    <span class="icon"></span>
-    <span class="text">Masukkan data gaji</span>
+
+  <div class="finance-main">
+    <div class="finance-amount">
+      <strong id="gajiMin">Rp 0</strong>
+      <small>Gaji minimal agar cicilan aman (≤30%)</small>
+    </div>
+
+    <div class="finance-progress">
+      <div class="progress-label">
+        <span>Keamanan Finansial</span>
+        <span id="ratioText">0%</span>
+      </div>
+      <div class="progress-bar soft">
+        <div class="progress-fill" id="financeBar"></div>
+      </div>
+    </div>
   </div>
+
+  <div id="statusBox" class="status idle show">
+    <span class="icon">💼</span>
+    <span class="text">Masukkan data cicilan</span>
+  </div>
+
+</div>
   
   <div id="smartAdvice" class="smart-advice"></div>
   <div id="unitMatch" class="unit-match"></div>
@@ -762,6 +854,8 @@ const gajiMinEl = document.getElementById("gajiMin");
 const gajiEl = document.getElementById("gaji");
 const gajiSuamiEl = document.getElementById("gajiSuami");
 const gajiIstriEl = document.getElementById("gajiIstri");
+const financeBar = document.getElementById("financeBar");
+const ratioText = document.getElementById("ratioText");
 const coupleToggle = document.getElementById("coupleToggle");
 const coupleInput = document.getElementById("coupleInput");
 
@@ -854,35 +948,56 @@ function updateGaji(){
   hitung();
 
   const cicilan = getCicilan();
+
+  // 1️⃣ belum ada cicilan
   if(!cicilan){
     setStatus("idle","Masukkan data cicilan","💼");
+    financeBar.style.width = "0%";
+    ratioText.textContent = "0%";
     return;
   }
 
+  // 2️⃣ hitung gaji minimal
   const gajiMinimal = Math.ceil(cicilan / 0.3);
   gajiMinEl.textContent = "Rp " + formatRupiah(gajiMinimal);
 
+  // 3️⃣ belum aktif pasangan
   if(!coupleToggle.checked){
     setStatus("idle","Aktifkan & isi gaji pasangan","👨‍👩‍👧");
+    financeBar.style.width = "0%";
+    ratioText.textContent = "0%";
     return;
   }
 
+  // 4️⃣ ambil total gaji
   const totalGaji =
     cleanNumber(gajiSuamiEl.value) +
     cleanNumber(gajiIstriEl.value);
 
   if(!totalGaji){
     setStatus("idle","Masukkan gaji pasangan","💰");
+    financeBar.style.width = "0%";
+    ratioText.textContent = "0%";
     return;
   }
 
+  // 5️⃣ analisa rasio
   const rasio = cicilan / totalGaji;
+  const percent = Math.min(rasio * 100, 100);
+
+  financeBar.style.width = percent + "%";
+  ratioText.textContent = Math.round(percent) + "%";
 
   if(rasio <= 0.3){
+    financeBar.className = "progress-fill safe";
     setStatus("ok","Aman • Rasio cicilan sehat","✅");
-  }else if(rasio <= 0.4){
+  }
+  else if(rasio <= 0.4){
+    financeBar.className = "progress-fill warn";
     setStatus("warn","Kurang aman • Perlu pertimbangan","⚠️");
-  }else{
+  }
+  else{
+    financeBar.className = "progress-fill danger";
     setStatus("bad","Berat • Risiko tinggi","❌");
   }
 }
