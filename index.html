@@ -289,67 +289,94 @@ input.error{
 ================================ */
 .testi-card{
   margin-top:22px;
-  padding:18px;
-  border-radius:22px;
-  background:rgba(255,255,255,.08);
-  backdrop-filter:blur(16px);
-  -webkit-backdrop-filter:blur(16px);
-  box-shadow:0 20px 40px rgba(0,0,0,.12);
+  padding:18px 14px 20px;
+  border-radius:24px;
+  background:linear-gradient(
+    180deg,
+    rgba(255,255,255,.12),
+    rgba(255,255,255,.04)
+  );
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  box-shadow:0 24px 48px rgba(0,0,0,.18);
   position:relative;
   overflow:hidden;
 }
 
+/* SLIDER */
 .testi-slider{
-  position:relative;
-  min-height:110px;
+  display:flex;
+  gap:14px;
+  overflow-x:auto;
+  scroll-snap-type:x mandatory;
+  -webkit-overflow-scrolling:touch;
+  padding-bottom:4px;
+}
+
+.testi-slider::-webkit-scrollbar{
+  display:none;
 }
 
 /* ITEM */
 .testi-item{
-  min-width:260px;
+  flex:0 0 78%;
+  scroll-snap-align:center;
   padding:18px;
-  border-radius:18px;
+  border-radius:20px;
   background:rgba(255,255,255,.08);
-  transition:.35s cubic-bezier(.4,0,.2,1);
+  backdrop-filter:blur(14px);
+  transition:
+    transform .45s cubic-bezier(.4,0,.2,1),
+    opacity .45s ease,
+    box-shadow .45s ease;
   opacity:.45;
   transform:scale(.94);
-  backdrop-filter:blur(14px);
 }
 
-/* TESTI AKTIF */
+/* AKTIF */
 .testi-item.active{
   opacity:1;
   transform:scale(1);
-  box-shadow:0 14px 34px rgba(0,0,0,.28);
+  box-shadow:0 16px 38px rgba(0,0,0,.32);
 }
 
-/* WARNA HALUS SESUAI STATUS */
+/* STATUS GLOW */
 .testi-item.active[data-status="ok"]{
-  box-shadow:0 0 0 1px rgba(46,204,113,.4),
-             0 18px 36px rgba(46,204,113,.25);
+  box-shadow:
+    0 0 0 1px rgba(46,204,113,.45),
+    0 18px 40px rgba(46,204,113,.35);
 }
 
 .testi-item.active[data-status="warn"]{
-  box-shadow:0 0 0 1px rgba(241,196,15,.4),
-             0 18px 36px rgba(241,196,15,.25);
+  box-shadow:
+    0 0 0 1px rgba(241,196,15,.45),
+    0 18px 40px rgba(241,196,15,.35);
 }
 
 .testi-item.active[data-status="bad"]{
-  box-shadow:0 0 0 1px rgba(231,76,60,.4),
-             0 18px 36px rgba(231,76,60,.25);
+  box-shadow:
+    0 0 0 1px rgba(231,76,60,.45),
+    0 18px 40px rgba(231,76,60,.35);
 }
 
 /* STAR */
 .testi-item .stars{
   font-size:14px;
-  margin-bottom:6px;
   letter-spacing:1px;
+  margin-bottom:8px;
+}
+
+/* TEXT */
+.testi-item p{
+  font-size:14px;
+  line-height:1.5;
+  margin:0;
 }
 
 /* NAME */
 .testi-item strong{
   display:block;
-  margin-top:6px;
+  margin-top:10px;
   font-weight:600;
   opacity:.85;
 }
@@ -358,22 +385,22 @@ input.error{
 .testi-dots{
   display:flex;
   justify-content:center;
-  gap:6px;
-  margin-top:12px;
+  gap:8px;
+  margin-top:14px;
 }
 
 .testi-dots span{
   width:6px;
   height:6px;
   border-radius:50%;
-  background:rgba(255,255,255,.3);
-  transition:.3s;
+  background:rgba(255,255,255,.35);
+  transition:.35s cubic-bezier(.4,0,.2,1);
 }
 
 .testi-dots span.active{
-  width:18px;
-  border-radius:10px;
-  background:#2ecc71;
+  width:20px;
+  border-radius:12px;
+  background:linear-gradient(135deg,#2ecc71,#6ee7b7);
 }
 
 .disclaimer{
