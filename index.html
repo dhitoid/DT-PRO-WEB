@@ -1507,12 +1507,14 @@ function generateUnitMatch(){
 let testiIndex = 0;
 let autoTimer;
 let startX = 0;
+let allowScroll = true;
 
 function startAuto(){
   stopAuto();
   autoTimer = setInterval(()=>{
+    allowScroll = false;
     showTesti((testiIndex + 1) % testiItems.length);
-  }, 4200);
+  }, 6600);
 }
 
 function stopAuto(){
@@ -1530,6 +1532,8 @@ slider.addEventListener("touchend",e=>{
   const endX = e.changedTouches[0].clientX;
   const diff = startX - endX;
 
+  allowScroll = true;
+
   if(Math.abs(diff) > 50){
     if(diff > 0){
       showTesti((testiIndex + 1) % testiItems.length);
@@ -1545,10 +1549,11 @@ testiItems.forEach((_,i)=>{
   const dot = document.createElement("span");
   if(i===0) dot.classList.add("active");
   dot.onclick = ()=>{
-    stopAuto();
-    showTesti(i);
-    startAuto();
-  };
+  stopAuto();
+  allowScroll = true;
+  showTesti(i);
+  startAuto();
+};
   testiDots.appendChild(dot);
 });
 
@@ -1561,11 +1566,13 @@ function showTesti(i){
   testiItems[testiIndex].classList.add("active");
   testiDots.children[testiIndex].classList.add("active");
 
-  testiItems[testiIndex].scrollIntoView({
-    behavior:"smooth",
-    inline:"center",
-    block:"nearest"
-  });
+  if(allowScroll){
+    testiItems[testiIndex].scrollIntoView({
+      behavior:"smooth",
+      inline:"center",
+      block:"nearest"
+    });
+  }
 }
 
 /* AUTO PLAY */
