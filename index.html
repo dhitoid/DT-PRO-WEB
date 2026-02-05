@@ -490,56 +490,83 @@ input.error{
 </div>
 
 <script>
-/* FORMAT ANGKA */
+/* ================== UTIL ================== */
 function formatRupiah(n){
   return n.toLocaleString("id-ID");
 }
 function cleanNumber(v){
-  return parseInt(v.replace(/\./g,"")) || 0;
+  return parseInt((v||"").toString().replace(/\./g,"")) || 0;
 }
 
-const coupleToggle = document.getElementById("coupleToggle");
-const coupleInput = document.getElementById("coupleInput");
-const gajiSuamiEl = document.getElementById("gajiSuami");
-const gajiIstriEl = document.getElementById("gajiIstri");
-
-coupleToggle.addEventListener("change",()=>{
-  coupleInput.classList.toggle("show", coupleToggle.checked);
-  updateGaji();
-});
-
-[gajiSuamiEl, gajiIstriEl].forEach(el=>{
-  el.addEventListener("input",()=>{
-    el.value = formatRupiah(cleanNumber(el.value));
-    updateGaji();
-  });
-});
-
+/* ================== ELEMENT ================== */
 const hargaEl = document.getElementById("harga");
 const dpEl = document.getElementById("dp");
 const tenorEl = document.getElementById("tenor");
 const bungaEl = document.getElementById("bunga");
 const hasil = document.getElementById("hasil");
 
-/* ===== PROGRESS ELEMENT ===== */
+const gajiEl = document.getElementById("gaji");
+const gajiSuamiEl = document.getElementById("gajiSuami");
+const gajiIstriEl = document.getElementById("gajiIstri");
+const coupleToggle = document.getElementById("coupleToggle");
+const coupleInput = document.getElementById("coupleInput");
+
+const statusEl = document.getElementById("status");
+
 const dpBar = document.getElementById("dpBar");
 const tenorBar = document.getElementById("tenorBar");
 const dpVal = document.getElementById("dpVal");
 const tenorVal = document.getElementById("tenorVal");
 
-/* INPUT FORMAT */
-hargaEl.addEventListener("input",()=>{
-  const num = cleanNumber(hargaEl.value);
-  hargaEl.value = formatRupiah(num);
-  hitung();
-});
+const fixCicilanEl = document.getElementById("fixCicilan");
+const floatCicilanEl = document.getElementById("floatCicilan");
 
-const gajiMin = document.getElementById("gajiMin");
+const leadModal = document.getElementById("leadModal");
+const namaLead = document.getElementById("namaLead");
+const waLead = document.getElementById("waLead");
+const submitBtn = document.getElementById("submitBtn");
 
+/* ================== HITUNG CICILAN ================== */
+function hitung(){
+  const harga = cleanNumber(hargaEl.value);
+  if(!harga) return;
+
+  const dp = harga * (dpEl.value/100);
+  const pokok = harga - dp;
+  const bulan = tenorEl.value * 12;
+  const bunga = (bungaEl.value/100)/12;
+
+  const cicilan = pokok * bunga / (1 - Math.pow(1+bunga, -bulan));
+  hasil.textContent = Math.round(cicilan);
+
+  updateGaji();
+}
+
+/* ================== SIMULASI BANK ================== */
+function hitungBank(){
+  const harga = cleanNumber(hargaEl.value);
+  if(!harga) return;
+
+  const dp = harga * (dpEl.value/100);
+  const pokok = harga - dp;
+  const bulan = tenorEl.value * 12;
+
+  const bungaFix = 0.07 / 12;
+  const bungaFloat = 0.11 / 12;
+
+  const fix = pokok * bungaFix / (1 - Math.pow(1+bungaFix, -bulan));
+  const flo = pokok * bungaFloat / (1 - Math.pow(1+bungaFloat, -bulan));
+
+  fixCicilanEl.textContent = "Rp " + formatRupiah(Math.round(fix));
+  floatCicilanEl.textContent = "Rp " + formatRupiah(Math.round(flo));
+}
+
+/* ================== GAJI & STATUS ================== */
 function updateGaji(){
   const cicilan = cleanNumber(hasil.textContent);
-  let totalGaji = 0;
+  if(!cicilan) return;
 
+  let totalGaji = 0;
   if(coupleToggle.checked){
     totalGaji =
       cleanNumber(gajiSuamiEl.value) +
@@ -548,7 +575,7 @@ function updateGaji(){
     totalGaji = cleanNumber(gajiEl.value);
   }
 
-  if(!totalGaji || !cicilan) return;
+  if(!totalGaji) return;
 
   const rasio = cicilan / totalGaji;
 
@@ -557,91 +584,56 @@ function updateGaji(){
     rasio <= 0.4 ? "Perlu Dipertimbangkan" :
     "Berat";
 
-  statusEl.className = "status " +
-    (rasio <= 0.3 ? "ok" :
-     rasio <= 0.4 ? "warn" : "danger");
+  statusEl.className =
+    "status " + (rasio <= 0.3 ? "ok" : rasio <= 0.4 ? "warn" : "danger");
 }
 
-[hargaEl, dpEl, tenorEl, bungaEl].forEach(el=>{
-  el.addEventListener("input", updateGaji);
-});
-
-/* HITUNG CICILAN */
-function hitung(){
-  const harga = cleanNumber(hargaEl.value);
-  const dp = harga * (dpEl.value/100);
-  const pokok = harga - dp;
-  const bulan = tenorEl.value * 12;
-  const bunga = (bungaEl.value/100)/12;
-
-  const cicilan = pokok * bunga / (1 - Math.pow(1+bunga, -bulan));
-  hasil.textContent = "Rp " + formatRupiah(Math.round(cicilan));
-
-  updateGaji();
-}
-
-const fixCicilanEl = document.getElementById("fixCicilan");
-const floatCicilanEl = document.getElementById("floatCicilan");
-
-function hitungBank(){
-  const harga = cleanNumber(hargaEl.value);
-  const dp = harga * (dpEl.value/100);
-  const pokok = harga - dp;
-  const bulan = tenorEl.value * 12;
-
-  // skenario bank
-  const bungaFix = 0.07 / 12;      // 7% fix
-  const bungaFloat = 0.11 / 12;    // 11% floating
-
-  const cicilanFix =
-    pokok * bungaFix / (1 - Math.pow(1+bungaFix, -bulan));
-
-  const cicilanFloat =
-    pokok * bungaFloat / (1 - Math.pow(1+bungaFloat, -bulan));
-
-  fixCicilanEl.textContent =
-    "Rp " + formatRupiah(Math.round(cicilanFix));
-
-  floatCicilanEl.textContent =
-    "Rp " + formatRupiah(Math.round(cicilanFloat));
-}
-
-/* ===== UPDATE PROGRESS (TAMBAHAN) ===== */
+/* ================== PROGRESS ================== */
 function updateProgress(){
   const dp = Math.min(Math.max(dpEl.value,0),100);
   dpBar.style.width = dp + "%";
   dpVal.textContent = dp;
 
   const tenor = Math.min(Math.max(tenorEl.value,1),30);
-  tenorBar.style.width = (tenor / 30 * 100) + "%";
+  tenorBar.style.width = (tenor/30*100) + "%";
   tenorVal.textContent = tenor;
 }
 
-[hargaEl,dpEl,tenorEl,bungaEl].forEach(el=>{
+/* ================== EVENT ================== */
+[hargaEl, gajiEl, gajiSuamiEl, gajiIstriEl].forEach(el=>{
+  if(!el) return;
   el.addEventListener("input",()=>{
+    el.value = formatRupiah(cleanNumber(el.value));
     hitung();
-    updateProgress();
-    hitungBank();   // 👈 TAMBAHAN
-    updateGaji();
+    hitungBank();
   });
 });
 
-hitungBank();
-hitung();
-updateProgress();
+[dpEl, tenorEl, bungaEl].forEach(el=>{
+  el.addEventListener("input",()=>{
+    hitung();
+    hitungBank();
+    updateProgress();
+  });
+});
 
-/* ===== MODAL ===== */
-function openLead(){leadModal.classList.add("active")}
+coupleToggle.addEventListener("change",()=>{
+  coupleInput.classList.toggle("show", coupleToggle.checked);
+  updateGaji();
+});
+
+/* ================== MODAL ================== */
+function openLead(){ leadModal.classList.add("active") }
 function closeLead(e){
   if(!e || e.target===leadModal) leadModal.classList.remove("active");
 }
 
-/* ===== WA NORMALIZE ===== */
+/* ================== WA & SHEET ================== */
 function normalizeWA(input){
-  let wa = input.replace(/\D/g, "");
+  let wa = input.replace(/\D/g,"");
   if(wa.startsWith("62")) wa = "0"+wa.slice(2);
   if(!wa.startsWith("0")) return null;
-  if(wa.length < 10 || wa.length > 15) return null;
+  if(wa.length<10||wa.length>15) return null;
   return wa;
 }
 
@@ -649,49 +641,44 @@ const SHEET_API = "https://script.google.com/macros/s/AKfycbw5Ghfnu_J0_mVKsN5eUT
 
 function submitLead(){
   const nama = namaLead.value.trim();
-  const waRaw = waLead.value.trim();
-  const wa = normalizeWA(waRaw);
-  const harga = formatRupiah(cleanNumber(hargaEl.value));
-  const cicilan = hasil.textContent;
+  const wa = normalizeWA(waLead.value.trim());
 
   namaLead.classList.toggle("error", !nama);
   waLead.classList.toggle("error", !wa);
 
   if(!nama || !wa){
-    alert("Nama & WhatsApp wajib diisi dengan benar");
+    alert("Nama & WhatsApp wajib diisi");
     return;
   }
 
-  submitBtn.textContent="Mengirim...";
-  submitBtn.disabled=true;
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Mengirim...";
 
   window.open(
-    "https://wa.me/6281802168184?text=" + encodeURIComponent(
-      "Halo, saya mau konsultasi KPR\n\n"+
-      "Nama: "+nama+"\n"+
-      "WhatsApp: "+wa+"\n"+
-      "Harga Rumah: Rp "+harga+"\n"+
-      "Cicilan: "+cicilan
-    ),
-    "_blank"
+    "https://wa.me/6281802168184?text="+encodeURIComponent(
+      `Halo, saya mau konsultasi KPR\n\nNama: ${nama}\nWA: ${wa}\nCicilan: Rp ${formatRupiah(cleanNumber(hasil.textContent))}`
+    ),"_blank"
   );
 
-  const formData = new FormData();
-  formData.append("nama", nama);
-  formData.append("wa", wa);
-  formData.append("harga", harga);
-  formData.append("cicilan", cicilan);
+  const fd = new FormData();
+  fd.append("nama",nama);
+  fd.append("wa",wa);
+  fd.append("cicilan",hasil.textContent);
 
-  fetch(SHEET_API,{method:"POST",body:formData})
+  fetch(SHEET_API,{method:"POST",body:fd})
     .finally(()=>{
-      submitBtn.textContent="Kirim ke WhatsApp";
       submitBtn.disabled=false;
+      submitBtn.textContent="Kirim ke WhatsApp";
       closeLead();
     });
 }
 
+/* ================== INIT ================== */
+hitung();
+hitungBank();
+updateProgress();
 document.getElementById("year").textContent = new Date().getFullYear();
-
 </script>
+
 </body>
 </html>
