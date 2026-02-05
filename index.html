@@ -498,6 +498,23 @@ function cleanNumber(v){
   return parseInt(v.replace(/\./g,"")) || 0;
 }
 
+const coupleToggle = document.getElementById("coupleToggle");
+const coupleInput = document.getElementById("coupleInput");
+const gajiSuamiEl = document.getElementById("gajiSuami");
+const gajiIstriEl = document.getElementById("gajiIstri");
+
+coupleToggle.addEventListener("change",()=>{
+  coupleInput.classList.toggle("show", coupleToggle.checked);
+  updateGaji();
+});
+
+[gajiSuamiEl, gajiIstriEl].forEach(el=>{
+  el.addEventListener("input",()=>{
+    el.value = formatRupiah(cleanNumber(el.value));
+    updateGaji();
+  });
+});
+
 const hargaEl = document.getElementById("harga");
 const dpEl = document.getElementById("dp");
 const tenorEl = document.getElementById("tenor");
@@ -672,23 +689,6 @@ function submitLead(){
       closeLead();
     });
 }
-
-const coupleToggle = document.getElementById("coupleToggle");
-const coupleInput = document.getElementById("coupleInput");
-const gajiSuamiEl = document.getElementById("gajiSuami");
-const gajiIstriEl = document.getElementById("gajiIstri");
-
-coupleToggle.addEventListener("change",()=>{
-  coupleInput.classList.toggle("show", coupleToggle.checked);
-  updateGaji();
-});
-
-[gajiSuamiEl, gajiIstriEl].forEach(el=>{
-  el.addEventListener("input",()=>{
-    el.value = formatRupiah(cleanNumber(el.value));
-    updateGaji();
-  });
-});
 
 document.getElementById("year").textContent = new Date().getFullYear();
 
