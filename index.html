@@ -424,6 +424,66 @@ input.error{
   100%{transform:translateX(0)}
 }
 
+.save-actions{
+  display:flex;
+  gap:10px;
+  margin-top:14px;
+}
+
+.save-actions button{
+  flex:1;
+  padding:12px;
+  border-radius:12px;
+  border:none;
+  font-weight:600;
+  cursor:pointer;
+  background:rgba(255,255,255,.08);
+  color:#fff;
+  backdrop-filter:blur(12px);
+  transition:.3s;
+}
+
+.save-actions button:hover{
+  background:rgba(255,255,255,.16);
+}
+
+.saved-list{
+  margin-top:14px;
+  display:none;
+}
+
+.saved-list.show{
+  display:block;
+}
+
+.saved-item{
+  padding:14px;
+  border-radius:14px;
+  background:rgba(255,255,255,.06);
+  margin-bottom:10px;
+}
+
+.saved-item strong{
+  font-size:15px;
+}
+
+.saved-actions{
+  margin-top:8px;
+  display:flex;
+  gap:8px;
+}
+
+.saved-actions button{
+  flex:1;
+  padding:8px;
+  border-radius:10px;
+  border:none;
+  font-size:13px;
+  cursor:pointer;
+  background:rgba(255,255,255,.1);
+  color:#fff;
+}
+
 </style>
 </head>
 
@@ -482,6 +542,14 @@ input.error{
       <small>Perkiraan Cicilan / bulan</small>
       <h2 id="hasil">Rp 0</h2>
     </div>
+    
+    <div class="save-actions">
+      <button onclick="saveSimulation()">💾 Simpan Hasil</button>
+      <button onclick="toggleSaved()">📂 Lihat Simpanan</button>
+    </div>
+
+    <div id="savedList" class="saved-list"></div>
+
     
     <div class="info-box">
   🏦 Simulasi Bank:
@@ -607,6 +675,7 @@ const namaLead = document.getElementById("namaLead");
 const waLead = document.getElementById("waLead");
 const submitBtn = document.getElementById("submitBtn");
 const statusBox = document.getElementById("statusBox");
+const savedListEl = document.getElementById("savedList");
 
 /* =========================================================
    INIT DEFAULT VALUE (WAJIB)
@@ -837,6 +906,80 @@ function submitLead(){
       closeLead();
     });
 }
+
+function getSaved(){
+  return JSON.parse(localStorage.getItem("kpr_saved") || "[]");
+}
+
+function saveSimulation(){
+  const data = {
+    waktu: new Date().toLocaleString("id-ID"),
+    harga: hargaEl.value,
+    cicilan: hasil.textContent,
+    gajiMin: gajiMinEl.textContent
+  };
+
+  const saved = getSaved();
+  saved.unshift(data);
+  localStorage.setItem("kpr_saved", JSON.stringify(saved));
+
+  renderSaved();
+  toggleSaved(true);
+}
+
+function toggleSaved(force){
+  if(force !== undefined){
+    savedListEl.classList.toggle("show", force);
+  }else{
+    savedListEl.classList.toggle("show");
+  }
+  renderSaved();
+}
+
+function renderSaved(){
+  const saved = getSaved();
+  if(!saved.length){
+    savedListEl.innerHTML = "<small>Belum ada simulasi tersimpan</small>";
+    return;
+  }
+
+  savedListEl.innerHTML = saved.map((s,i)=>`
+    <div class="saved-item">
+      <strong>${s.cicilan}</strong><br>
+      <small>Harga: Rp ${s.harga}</small><br>
+      <small>Gaji Min: ${s.gajiMin}</small><br>
+      <small>${s.waktu}</small>
+
+      <div class="saved-actions">
+        <button onclick="shareSaved(${i})">📤 Share</button>
+        <button onclick="deleteSaved(${i})">🗑️ Hapus</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+function deleteSaved(i){
+  const saved = getSaved();
+  saved.splice(i,1);
+  localStorage.setItem("kpr_saved", JSON.stringify(saved));
+  renderSaved();
+}
+
+function shareSaved(i){
+  const s = getSaved()[i];
+  const text =
+`Simulasi KPR
+Harga Rumah: Rp ${s.harga}
+Cicilan: ${s.cicilan}
+Estimasi Gaji Minimal: ${s.gajiMin}`;
+
+  window.open(
+    "https://wa.me/?text="+encodeURIComponent(text),
+    "_blank"
+  );
+}
+
+renderSaved();
 
 /* =========================================================
    INIT
