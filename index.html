@@ -858,23 +858,23 @@ input.error{
 <div class="testi-card">
   <div class="testi-slider" id="testiSlider">
     
-    <div class="testi-item active">
-      <div class="stars">⭐⭐⭐⭐⭐</div>
-      <p>Simulasinya jelas dan gampang dipahami. Jadi yakin ambil rumah.</p>
-      <strong>— Andi, Tangerang</strong>
-    </div>
+<div class="testi-item active" data-status="ok">
+  <div class="stars">⭐⭐⭐⭐⭐</div>
+  <p>Simulasinya jelas dan gampang dipahami. Jadi yakin ambil rumah.</p>
+  <strong>— Andi, Tangerang</strong>
+</div>
 
-    <div class="testi-item">
-      <div class="stars">⭐⭐⭐⭐⭐</div>
-      <p>Kalkulator ini beda, real time dan keliatan aman atau nggaknya.</p>
-      <strong>— Yulia & Suami, Depok</strong>
-    </div>
+<div class="testi-item" data-status="warn">
+  <div class="stars">⭐⭐⭐⭐⭐</div>
+  <p>Kalkulator ini beda, real time dan keliatan aman atau nggaknya.</p>
+  <strong>— Yulia & Suami, Depok</strong>
+</div>
 
-    <div class="testi-item">
-      <div class="stars">⭐⭐⭐⭐⭐</div>
-      <p>Baru kali ini simulasi KPR yang jujur soal risiko cicilan.</p>
-      <strong>— Fajar, Bekasi</strong>
-    </div>
+<div class="testi-item" data-status="bad">
+  <div class="stars">⭐⭐⭐⭐⭐</div>
+  <p>Baru kali ini simulasi KPR yang jujur soal risiko cicilan.</p>
+  <strong>— Fajar, Bekasi</strong>
+</div>
 
   </div>
 
@@ -1056,12 +1056,26 @@ function hitungBank(){
    CEK RASIO GAJI
 ========================================================= */
 function updateTestimoni(status){
-  const data = testiData[status] || testiData.ok;
-  testiItems.forEach((item,i)=>{
-    const d = data[i % data.length];
-    item.querySelector("p").textContent = d.text;
-    item.querySelector("strong").textContent = "— " + d.name;
+  let activeFound = false;
+
+  testiItems.forEach(item=>{
+    item.classList.remove("active");
+
+    if(item.dataset.status === status && !activeFound){
+      item.classList.add("active");
+      item.scrollIntoView({
+        behavior: "smooth",
+        inline: "center",
+        block: "nearest"
+      });
+      activeFound = true;
+    }
   });
+
+  // fallback: kalau belum ada status cocok
+  if(!activeFound && testiItems[0]){
+    testiItems[0].classList.add("active");
+  }
 }
 
 function setStatus(type, text, icon){
