@@ -517,6 +517,7 @@ const tenorVal = document.getElementById("tenorVal");
 const fixCicilanEl = document.getElementById("fixCicilan");
 const floatCicilanEl = document.getElementById("floatCicilan");
 
+const gajiMinEl = document.getElementById("gajiMin");
 const gajiEl = document.getElementById("gaji");
 const gajiSuamiEl = document.getElementById("gajiSuami");
 const gajiIstriEl = document.getElementById("gajiIstri");
@@ -598,36 +599,34 @@ function hitungBank(){
    CEK RASIO GAJI
 ========================================================= */
 function updateGaji(){
+  // pastikan cicilan ada
   hitung();
 
   const cicilan = getCicilan();
-  let totalGaji = 0;
-
-  if(coupleToggle.checked){
-    totalGaji =
-      cleanNumber(gajiSuamiEl.value) +
-      cleanNumber(gajiIstriEl.value);
-  }else{
-    totalGaji = cleanNumber(gajiEl.value);
-  }
-
-  if(!totalGaji || !cicilan){
-    statusEl.textContent = "Masukkan gaji";
-    statusEl.className = "status";
+  if(!cicilan){
+    gajiMinEl.textContent = "Rp 0";
     return;
   }
 
-  const rasio = cicilan / totalGaji;
+  // gaji minimal = cicilan / 30%
+  const gajiMinimal = Math.ceil(cicilan / 0.3);
+  gajiMinEl.textContent =
+    "Rp " + formatRupiah(gajiMinimal);
 
-  statusEl.textContent =
-    rasio <= 0.3 ? "Aman" :
-    rasio <= 0.4 ? "Perlu Dipertimbangkan" :
-    "Berat";
+  // kalau mode pasangan aktif → validasi input
+  if(coupleToggle.checked){
+    const totalGaji =
+      cleanNumber(gajiSuamiEl.value) +
+      cleanNumber(gajiIstriEl.value);
 
-  statusEl.className =
-    "status " +
-    (rasio <= 0.3 ? "ok" :
-     rasio <= 0.4 ? "warn" : "danger");
+    if(totalGaji){
+      gajiMinEl.textContent =
+        "Rp " + formatRupiah(gajiMinimal) +
+        (totalGaji >= gajiMinimal
+          ? " ✅ Aman"
+          : " ⚠️ Kurang");
+    }
+  }
 }
 
 /* =========================================================
@@ -678,15 +677,6 @@ function updateAll(){
 ========================================================= */
 coupleToggle.addEventListener("change",()=>{
   coupleInput.classList.toggle("show", coupleToggle.checked);
-  gajiEl.disabled = coupleToggle.checked;
-
-  if(coupleToggle.checked){
-    gajiEl.value = "";
-  }else{
-    gajiSuamiEl.value = "";
-    gajiIstriEl.value = "";
-  }
-
   updateAll();
 });
 
