@@ -519,6 +519,65 @@ input.error{
   }
 }
 
+.unit-match{
+  margin-top:14px;
+  padding:16px;
+  border-radius:18px;
+  display:none;
+  animation:fadeUp .4s ease;
+}
+
+.unit-match.good{
+  background:linear-gradient(
+    135deg,
+    rgba(34,197,94,.18),
+    rgba(255,255,255,.05)
+  );
+  border:1px solid rgba(34,197,94,.35);
+}
+
+.unit-match.mid{
+  background:linear-gradient(
+    135deg,
+    rgba(250,204,21,.18),
+    rgba(255,255,255,.05)
+  );
+  border:1px solid rgba(250,204,21,.35);
+}
+
+.unit-match.bad{
+  background:linear-gradient(
+    135deg,
+    rgba(239,68,68,.18),
+    rgba(255,255,255,.05)
+  );
+  border:1px solid rgba(239,68,68,.35);
+}
+
+.unit-match h4{
+  margin:0 0 6px;
+  font-size:15px;
+}
+
+.unit-match p{
+  margin:0;
+  font-size:13px;
+  line-height:1.5;
+}
+
+.badge{
+  display:inline-block;
+  padding:4px 10px;
+  border-radius:999px;
+  font-size:11px;
+  font-weight:600;
+  margin-bottom:8px;
+}
+
+.badge.good{background:#22c55e;color:white}
+.badge.mid{background:#facc15;color:#111}
+.badge.bad{background:#ef4444;color:white}
+
 </style>
 </head>
 
@@ -611,6 +670,7 @@ input.error{
   </div>
   
   <div id="smartAdvice" class="smart-advice"></div>
+  <div id="unitMatch" class="unit-match"></div>
   
   <div class="couple-box">
   <label class="switch">
@@ -714,6 +774,7 @@ const submitBtn = document.getElementById("submitBtn");
 const statusBox = document.getElementById("statusBox");
 const savedListEl = document.getElementById("savedList");
 const smartAdviceEl = document.getElementById("smartAdvice");
+const unitMatchEl = document.getElementById("unitMatch");
 
 /* =========================================================
    INIT DEFAULT VALUE (WAJIB)
@@ -848,6 +909,7 @@ function updateAll(){
   updateProgress();
   updateGaji();
   generateAdvice();
+  generateUnitMatch();
 }
 
 /* =========================================================
@@ -1069,6 +1131,65 @@ function generateAdvice(){
   advice += "<br><small>Simulasi ini bersifat estimasi.</small>";
 
   showAdvice(advice);
+}
+
+function generateUnitMatch(){
+  const cicilan = getCicilan();
+  if(!cicilan){
+    unitMatchEl.style.display = "none";
+    return;
+  }
+
+  let totalGaji = coupleToggle.checked
+    ? cleanNumber(gajiSuamiEl.value) + cleanNumber(gajiIstriEl.value)
+    : 0;
+
+  if(!totalGaji){
+    unitMatchEl.style.display = "none";
+    return;
+  }
+
+  const rasio = cicilan / totalGaji;
+
+  unitMatchEl.style.display = "block";
+  unitMatchEl.className = "unit-match";
+
+  if(rasio <= 0.3){
+    unitMatchEl.classList.add("good");
+    unitMatchEl.innerHTML = `
+      <span class="badge good">SANGAT COCOK</span>
+      <h4>Unit ini cocok dengan profil Anda</h4>
+      <p>
+        Cicilan masih dalam batas aman.
+        Unit ini realistis untuk jangka panjang
+        dan minim risiko finansial.
+      </p>
+    `;
+  }
+  else if(rasio <= 0.4){
+    unitMatchEl.classList.add("mid");
+    unitMatchEl.innerHTML = `
+      <span class="badge mid">CUKUP COCOK</span>
+      <h4>Unit masih bisa dipertimbangkan</h4>
+      <p>
+        Cicilan masih memungkinkan,
+        namun perlu perencanaan yang lebih matang
+        agar tetap nyaman ke depannya.
+      </p>
+    `;
+  }
+  else{
+    unitMatchEl.classList.add("bad");
+    unitMatchEl.innerHTML = `
+      <span class="badge bad">KURANG COCOK</span>
+      <h4>Unit ini cukup berat untuk profil Anda</h4>
+      <p>
+        Beban cicilan terlalu tinggi.
+        Disarankan memilih unit lain
+        atau menyesuaikan DP & tenor.
+      </p>
+    `;
+  }
 }
 
 /* =========================================================
