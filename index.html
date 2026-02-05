@@ -298,6 +298,61 @@ input.error{
   color:var(--muted);
   text-align:center;
 }
+
+.couple-box{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin:20px 0 12px;
+}
+
+.couple-input{
+  display:none;
+  gap:12px;
+}
+
+.couple-input.show{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+}
+
+/* switch modern */
+.switch{
+  position:relative;
+  width:46px;
+  height:26px;
+}
+
+.switch input{display:none}
+
+.switch .slider{
+  position:absolute;
+  inset:0;
+  background:#ccc;
+  border-radius:20px;
+  transition:.3s;
+}
+
+.switch .slider:before{
+  content:"";
+  position:absolute;
+  width:20px;
+  height:20px;
+  left:3px;
+  top:3px;
+  background:white;
+  border-radius:50%;
+  transition:.3s;
+}
+
+.switch input:checked + .slider{
+  background:var(--primary);
+}
+
+.switch input:checked + .slider:before{
+  transform:translateX(20px);
+}
+
 </style>
 </head>
 
@@ -375,6 +430,25 @@ input.error{
     <strong id="gajiMin">Rp 0</strong>
     <br><small>(maks. 30% dari penghasilan)</small>
   </div>
+  
+  <div class="couple-box">
+  <label class="switch">
+    <input type="checkbox" id="coupleToggle">
+    <span class="slider"></span>
+  </label>
+  <span class="label">Simulasi pasangan (gabung gaji)</span>
+</div>
+
+<div class="couple-input" id="coupleInput">
+  <div class="field">
+    <label>Gaji Suami</label>
+    <input type="text" id="gajiSuami" placeholder="Rp 0">
+  </div>
+  <div class="field">
+    <label>Gaji Istri</label>
+    <input type="text" id="gajiIstri" placeholder="Rp 0">
+  </div>
+</div>
 
   <!-- TESTIMONI -->
   <div class="testi">
@@ -446,15 +520,50 @@ hargaEl.addEventListener("input",()=>{
 const gajiMin = document.getElementById("gajiMin");
 
 function updateGaji(){
-  const cicilan = cleanNumber(
-    hasil.textContent.replace("Rp","").trim()
-  );
-  const gaji = cicilan * 3; // 30% rule
-  gajiMin.textContent = "Rp " + formatRupiah(Math.round(gaji));
+  const cicilan = cleanNumber(hasil.textContent);
+  let totalGaji = 0;
+
+  if(coupleToggle.checked){
+    totalGaji =
+      cleanNumber(gajiSuamiEl.value) +
+      cleanNumber(gajiIstriEl.value);
+  }else{
+    totalGaji = cleanNumber(gajiEl.value);
+  }
+
+  if(!totalGaji || !cicilan) return;
+
+  const rasio = cicilan / totalGaji;
+
+  statusEl.textContent =
+    rasio <= 0.3 ? "Aman" :
+    rasio <= 0.4 ? "Perlu Dipertimbangkan" :
+    "Berat";
+
+  statusEl.className = "status " +
+    (rasio <= 0.3 ? "ok" :
+     rasio <= 0.4 ? "warn" : "danger");
 }
 
 [hargaEl, dpEl, tenorEl, bungaEl].forEach(el=>{
   el.addEventListener("input", updateGaji);
+});
+
+const coupleToggle = document.getElementById("coupleToggle");
+const coupleInput = document.getElementById("coupleInput");
+const gajiSuamiEl = document.getElementById("gajiSuami");
+const gajiIstriEl = document.getElementById("gajiIstri");
+
+coupleToggle.addEventListener("change",()=>{
+  coupleInput.classList.toggle("show", coupleToggle.checked);
+  updateGaji();
+});
+
+[gajiSuamiEl, gajiIstriEl].forEach(el=>{
+  el.addEventListener("input",()=>{
+    el.value = formatRupiah(cleanNumber(el.value));
+    updateGaji();
+  });
 });
 
 /* HITUNG CICILAN */
