@@ -485,12 +485,12 @@ function hitungBank(){
 
 /* ===== UPDATE PROGRESS (TAMBAHAN) ===== */
 function updateProgress(){
-  const dp = Math.min(dpEl.value,100);
-  dpBar.style.width = (dp * 2) + "%";
+  const dp = Math.min(Math.max(dpEl.value,0),100);
+  dpBar.style.width = dp + "%";
   dpVal.textContent = dp;
 
-  const tenor = Math.min(tenorEl.value,30);
-  tenorBar.style.width = (tenor/30*100) + "%";
+  const tenor = Math.min(Math.max(tenorEl.value,1),30);
+  tenorBar.style.width = (tenor / 30 * 100) + "%";
   tenorVal.textContent = tenor;
 }
 
@@ -577,11 +577,9 @@ function updateGaji(){
   gajiMin.textContent = "Rp " + formatRupiah(Math.round(gaji));
 }
 
-[harga,dp,tenor,bunga].forEach(el=>{
-  el.addEventListener("input",updateGaji);
+[hargaEl, dpEl, tenorEl, bungaEl].forEach(el=>{
+  el.addEventListener("input", updateGaji);
 });
-
-updateGaji();
 
 document.getElementById("year").textContent = new Date().getFullYear();
 
