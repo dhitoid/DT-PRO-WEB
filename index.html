@@ -442,6 +442,8 @@ function hitung(){
 
   const cicilan = pokok * bunga / (1 - Math.pow(1+bunga, -bulan));
   hasil.textContent = "Rp " + formatRupiah(Math.round(cicilan));
+
+  updateGaji();
 }
 
 /* ===== UPDATE PROGRESS (TAMBAHAN) ===== */
@@ -525,27 +527,17 @@ function submitLead(){
     });
 }
 
-const dpRange = document.getElementById("dpRange");
-const tenorRange = document.getElementById("tenorRange");
 const gajiMin = document.getElementById("gajiMin");
 
-dpRange.addEventListener("input",()=>{
-  dp.value = dpRange.value;
-  dp.dispatchEvent(new Event("input"));
-});
-
-tenorRange.addEventListener("input",()=>{
-  tenor.value = tenorRange.value;
-  tenor.dispatchEvent(new Event("input"));
-});
-
 function updateGaji(){
-  const cicilan = cleanNumber(hasil.textContent.replace("Rp",""));
-  const gaji = cicilan * 3;
+  const cicilan = cleanNumber(
+    hasil.textContent.replace("Rp","").trim()
+  );
+  const gaji = cicilan * 3; // 30% rule
   gajiMin.textContent = "Rp " + formatRupiah(Math.round(gaji));
 }
 
-[harga,dp,tenor,bunga].forEach(el=>{
+[hargaEl,dpEl,tenorEl,bungaEl].forEach(el=>{
   el.addEventListener("input",updateGaji);
 });
 
