@@ -598,6 +598,8 @@ function hitungBank(){
    CEK RASIO GAJI
 ========================================================= */
 function updateGaji(){
+  hitung();
+
   const cicilan = getCicilan();
   let totalGaji = 0;
 
@@ -610,7 +612,7 @@ function updateGaji(){
   }
 
   if(!totalGaji || !cicilan){
-    statusEl.textContent = "-";
+    statusEl.textContent = "Masukkan gaji";
     statusEl.className = "status";
     return;
   }
@@ -667,7 +669,7 @@ function updateAll(){
   if(!el) return;
   el.addEventListener("input",()=>{
     el.value = formatRupiah(cleanNumber(el.value));
-    updateGaji();
+    updateAll();
   });
 });
 
@@ -677,7 +679,15 @@ function updateAll(){
 coupleToggle.addEventListener("change",()=>{
   coupleInput.classList.toggle("show", coupleToggle.checked);
   gajiEl.disabled = coupleToggle.checked;
-  updateGaji();
+
+  if(coupleToggle.checked){
+    gajiEl.value = "";
+  }else{
+    gajiSuamiEl.value = "";
+    gajiIstriEl.value = "";
+  }
+
+  updateAll();
 });
 
 /* =========================================================
