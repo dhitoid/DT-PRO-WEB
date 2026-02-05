@@ -1096,27 +1096,46 @@ function hitungBank(){
    CEK RASIO GAJI
 ========================================================= */
 function updateTestimoni(status){
-  let activeFound = false;
+  let activeIndex = 0;
+  let found = false;
 
-  testiItems.forEach(item=>{
+  testiItems.forEach((item,i)=>{
     item.classList.remove("active");
 
-    if(item.dataset.status === status && !activeFound){
-      item.classList.add("active");
-      item.scrollIntoView({
-        behavior: "smooth",
-        inline: "center",
-        block: "nearest"
-      });
-      activeFound = true;
+    if(item.dataset.status === status && !found){
+      activeIndex = i;
+      found = true;
     }
   });
 
-  // fallback: kalau belum ada status cocok
-  if(!activeFound && testiItems[0]){
-    testiItems[0].classList.add("active");
-  }
+  const activeItem = testiItems[activeIndex];
+  activeItem.classList.add("active");
+
+  activeItem.scrollIntoView({
+    behavior:"smooth",
+    inline:"center",
+    block:"nearest"
+  });
+
+  updateDots(activeIndex);
 }
+
+function updateDots(index){
+  const dots = testiDots.querySelectorAll("span");
+  dots.forEach((d,i)=>{
+    d.classList.toggle("active", i === index);
+  });
+}
+
+function renderTestiDots(){
+  testiDots.innerHTML = "";
+  testiItems.forEach((_,i)=>{
+    const dot = document.createElement("span");
+    if(i === 0) dot.classList.add("active");
+    testiDots.appendChild(dot);
+  });
+}
+renderTestiDots();
 
 function setStatus(type, text, icon){
   statusBox.className = "status " + type + " show";
