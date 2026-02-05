@@ -484,6 +484,41 @@ input.error{
   color:#fff;
 }
 
+.smart-advice{
+  margin-top:14px;
+  padding:16px;
+  border-radius:16px;
+  background:linear-gradient(
+    135deg,
+    rgba(0,200,255,.12),
+    rgba(255,255,255,.05)
+  );
+  backdrop-filter:blur(16px);
+  font-size:14px;
+  line-height:1.5;
+  display:none;
+  animation:fadeUp .4s ease;
+}
+
+.smart-advice.show{
+  display:block;
+}
+
+.smart-advice strong{
+  color:#6ee7ff;
+}
+
+@keyframes fadeUp{
+  from{
+    opacity:0;
+    transform:translateY(8px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
 </style>
 </head>
 
@@ -571,9 +606,11 @@ input.error{
   </div>
   
   <div id="statusBox" class="status idle">
-  <span class="icon"></span>
-  <span class="text">Masukkan data gaji</span>
-</div>
+    <span class="icon"></span>
+    <span class="text">Masukkan data gaji</span>
+  </div>
+  
+  <div id="smartAdvice" class="smart-advice"></div>
   
   <div class="couple-box">
   <label class="switch">
@@ -676,6 +713,7 @@ const waLead = document.getElementById("waLead");
 const submitBtn = document.getElementById("submitBtn");
 const statusBox = document.getElementById("statusBox");
 const savedListEl = document.getElementById("savedList");
+const smartAdviceEl = document.getElementById("smartAdvice");
 
 /* =========================================================
    INIT DEFAULT VALUE (WAJIB)
@@ -809,6 +847,7 @@ function updateAll(){
   hitungBank();
   updateProgress();
   updateGaji();
+  generateAdvice();
 }
 
 /* =========================================================
@@ -980,6 +1019,57 @@ Estimasi Gaji Minimal: ${s.gajiMin}`;
 }
 
 renderSaved();
+
+function showAdvice(text){
+  smartAdviceEl.innerHTML = text;
+  smartAdviceEl.classList.add("show");
+}
+
+function hideAdvice(){
+  smartAdviceEl.classList.remove("show");
+}
+
+function generateAdvice(){
+  const cicilan = getCicilan();
+  if(!cicilan){
+    hideAdvice();
+    return;
+  }
+
+  const harga = cleanNumber(hargaEl.value);
+  const dpPersen = dpEl.value;
+  const tenor = tenorEl.value;
+
+  let totalGaji = coupleToggle.checked
+    ? cleanNumber(gajiSuamiEl.value) + cleanNumber(gajiIstriEl.value)
+    : 0;
+
+  const rasio = totalGaji ? cicilan / totalGaji : 1;
+
+  let advice = `<strong>💡 Saran Cerdas:</strong><br>`;
+
+  /* ===== LOGIC ===== */
+
+  if(dpPersen < 20){
+    advice += "• DP masih kecil. Naikkan DP ke <b>20–30%</b> agar cicilan lebih ringan.<br>";
+  }
+
+  if(tenor < 15){
+    advice += "• Tenor relatif pendek. Pertimbangkan <b>20–25 tahun</b> supaya cicilan turun.<br>";
+  }
+
+  if(rasio > 0.4){
+    advice += "• Rasio cicilan terlalu berat. Kombinasi <b>DP lebih besar + tenor lebih panjang</b> sangat disarankan.<br>";
+  }else if(rasio > 0.3){
+    advice += "• Cicilan masih aman tapi mepet. Sedikit penyesuaian bisa membuat finansial lebih nyaman.<br>";
+  }else{
+    advice += "• Kondisi finansial tergolong <b>sehat & aman</b>. Anda siap ambil unit ini 👍<br>";
+  }
+
+  advice += "<br><small>Simulasi ini bersifat estimasi.</small>";
+
+  showAdvice(advice);
+}
 
 /* =========================================================
    INIT
