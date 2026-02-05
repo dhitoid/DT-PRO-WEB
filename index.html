@@ -359,6 +359,10 @@ input.error{
     0 18px 40px rgba(231,76,60,.35);
 }
 
+.testi-item:not(.active){
+  filter:saturate(.85);
+}
+
 /* STAR */
 .testi-item .stars{
   font-size:14px;
@@ -1002,6 +1006,7 @@ const smartAdviceEl = document.getElementById("smartAdvice");
 const unitMatchEl = document.getElementById("unitMatch");
 const testiItems = document.querySelectorAll(".testi-item");
 const testiDots = document.getElementById("testiDots");
+const slider = document.getElementById("testiSlider");
 
 const testiData = {
   ok: [
@@ -1095,30 +1100,6 @@ function hitungBank(){
 /* =========================================================
    CEK RASIO GAJI
 ========================================================= */
-function updateTestimoni(status){
-  let activeIndex = 0;
-  let found = false;
-
-  testiItems.forEach((item,i)=>{
-    item.classList.remove("active");
-
-    if(item.dataset.status === status && !found){
-      activeIndex = i;
-      found = true;
-    }
-  });
-
-  const activeItem = testiItems[activeIndex];
-  activeItem.classList.add("active");
-
-  activeItem.scrollIntoView({
-    behavior:"smooth",
-    inline:"center",
-    block:"nearest"
-  });
-
-  updateDots(activeIndex);
-}
 
 function updateDots(index){
   const dots = testiDots.querySelectorAll("span");
@@ -1131,7 +1112,6 @@ function setStatus(type, text, icon){
   statusBox.className = "status " + type + " show";
   statusBox.querySelector(".text").textContent = text;
   statusBox.querySelector(".icon").textContent = icon;
-  updateTestimoni(type);
 }
 
 function updateGaji(){
@@ -1501,46 +1481,67 @@ function generateUnitMatch(){
    TESTIMONI SLIDER
 ================================ */
 let testiIndex = 0;
+let autoTimer;
 let startX = 0;
-const slider = document.getElementById("testiSlider");
+
+function startAuto(){
+  stopAuto();
+  autoTimer = setInterval(()=>{
+    showTesti((testiIndex + 1) % testiItems.length);
+  }, 4200);
+}
+
+function stopAuto(){
+  if(autoTimer) clearInterval(autoTimer);
+}
+
+startAuto();
 
 slider.addEventListener("touchstart",e=>{
   startX = e.touches[0].clientX;
+  stopAuto();
 });
 
 slider.addEventListener("touchend",e=>{
   const endX = e.changedTouches[0].clientX;
   const diff = startX - endX;
 
-  if(Math.abs(diff) < 40) return;
-
-  if(diff > 0){
-    // swipe kiri
-    showTesti((testiIndex + 1) % testiItems.length);
-  }else{
-    // swipe kanan
-    showTesti(
-      (testiIndex - 1 + testiItems.length) % testiItems.length
-    );
+  if(Math.abs(diff) > 50){
+    if(diff > 0){
+      showTesti((testiIndex + 1) % testiItems.length);
+    }else{
+      showTesti((testiIndex - 1 + testiItems.length) % testiItems.length);
+    }
   }
+  startAuto();
 });
 
 /* CREATE DOT */
 testiItems.forEach((_,i)=>{
   const dot = document.createElement("span");
   if(i===0) dot.classList.add("active");
-  dot.onclick = ()=>showTesti(i);
+  dot.onclick = ()=>{
+    stopAuto();
+    showTesti(i);
+    startAuto();
+  };
   testiDots.appendChild(dot);
 });
 
 function showTesti(i){
-  testiItems[testiIndex].classList.remove("active");
-  testiDots.children[testiIndex].classList.remove("active");
+  testiItems.forEach(item=>item.classList.remove("active"));
+  testiDots.querySelectorAll("span").forEach(dot=>dot.classList.remove("active"));
 
   testiIndex = i;
 
   testiItems[testiIndex].classList.add("active");
   testiDots.children[testiIndex].classList.add("active");
+
+  testiItems[testiIndex].scrollIntoView({
+    behavior:"smooth",
+    inline:"center",
+    block:"nearest"
+  });
 }
 
 /* AUTO PLAY */
