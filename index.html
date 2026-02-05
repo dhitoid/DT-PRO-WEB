@@ -963,6 +963,31 @@ const unitMatchEl = document.getElementById("unitMatch");
 const testiItems = document.querySelectorAll(".testi-item");
 const testiDots = document.getElementById("testiDots");
 
+const testiData = {
+  ok: [
+    {
+      text:"Cicilannya ringan dan sesuai kemampuan kami.",
+      name:"Dewi & Suami, BSD"
+    },
+    {
+      text:"Simulasi ini bikin kami yakin ambil unit.",
+      name:"Hendra, Tangerang"
+    }
+  ],
+  warn: [
+    {
+      text:"Cicilan agak mepet tapi masih bisa diatur.",
+      name:"Riko, Depok"
+    }
+  ],
+  bad: [
+    {
+      text:"Simulasi ini jujur dan bikin saya nggak maksa.",
+      name:"Aldi, Bekasi"
+    }
+  ]
+};
+
 /* =========================================================
    INIT DEFAULT VALUE (WAJIB)
 ========================================================= */
@@ -1030,11 +1055,20 @@ function hitungBank(){
 /* =========================================================
    CEK RASIO GAJI
 ========================================================= */
+function updateTestimoni(status){
+  const data = testiData[status] || testiData.ok;
+  testiItems.forEach((item,i)=>{
+    const d = data[i % data.length];
+    item.querySelector("p").textContent = d.text;
+    item.querySelector("strong").textContent = "— " + d.name;
+  });
+}
 
 function setStatus(type, text, icon){
   statusBox.className = "status " + type + " show";
   statusBox.querySelector(".text").textContent = text;
   statusBox.querySelector(".icon").textContent = icon;
+  updateTestimoni(type);
 }
 
 function updateGaji(){
@@ -1404,6 +1438,29 @@ function generateUnitMatch(){
    TESTIMONI SLIDER
 ================================ */
 let testiIndex = 0;
+let startX = 0;
+const slider = document.getElementById("testiSlider");
+
+slider.addEventListener("touchstart",e=>{
+  startX = e.touches[0].clientX;
+});
+
+slider.addEventListener("touchend",e=>{
+  const endX = e.changedTouches[0].clientX;
+  const diff = startX - endX;
+
+  if(Math.abs(diff) < 40) return;
+
+  if(diff > 0){
+    // swipe kiri
+    showTesti((testiIndex + 1) % testiItems.length);
+  }else{
+    // swipe kanan
+    showTesti(
+      (testiIndex - 1 + testiItems.length) % testiItems.length
+    );
+  }
+});
 
 /* CREATE DOT */
 testiItems.forEach((_,i)=>{
