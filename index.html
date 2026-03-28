@@ -780,12 +780,12 @@ input.error{
   <section class="card">
     <div class="field">
       <label>Harga Properti</label>
-      <input id="harga" value="500.000.000">
+      <input id="harga" inputmode="numeric" pattern="[0-9]*" value="500000000">
     </div>
 
     <div class="field">
       <label>DP (%)</label>
-      <input id="dp" type="number" value="10">
+      <input id="dp" type="number" inputmode="numeric" value="10">
     </div>
 
     <!-- PROGRESS DP -->
@@ -801,7 +801,7 @@ input.error{
 
     <div class="field">
       <label>Tenor (Tahun)</label>
-      <input id="tenor" type="number" value="20">
+      <input id="tenor" type="number" inputmode="numeric" value="20">
     </div>
 
     <!-- PROGRESS TENOR -->
@@ -817,7 +817,7 @@ input.error{
 
     <div class="field">
       <label>Bunga (% / tahun)</label>
-      <input id="bunga" type="number" value="8">
+      <input id="bunga" type="number" inputmode="numeric" value="8">
     </div>
 
     <div class="result">
