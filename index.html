@@ -1163,7 +1163,7 @@ const coupleToggle = document.getElementById("coupleToggle");
 const coupleInput = document.getElementById("coupleInput");
 const statusEl = document.getElementById("status");
 const resultBox = document.querySelector(".result");
-const detailCard = document.querySelector("#detailKPR").parentElement;
+const detailCard = document.getElementById("detailKPR");
 
 const leadModal = document.getElementById("leadModal");
 const namaLead = document.getElementById("namaLead");
@@ -1478,19 +1478,16 @@ function updateProgress(){
 /* =========================================================
    UPDATE SEMUA (REALTIME)
 ========================================================= */
-function updateAll(){
-  hitung();
-  hitungBank();
+function updateAll() {
+  hitung();        // hitung cicilan normal
+  hitungBank();    // hitung cicilan bank fix/floating
 
-  if(bungaToggle.checked){
-    hitungMultiStage();
+  if (bungaToggle.checked) {
+    hitungMultiStage(); // hitung cicilan berjenjang
 
     // tampilkan detail
     detailCard.style.display = "block";
-
-  }else{
-    document.getElementById("detailKPR").innerHTML = "";
-
+  } else {
     // sembunyikan detail
     detailCard.style.display = "none";
   }
@@ -1529,32 +1526,26 @@ coupleToggle.addEventListener("change",()=>{
   updateAll();
 });
 
-bungaToggle.addEventListener("change", ()=>{
+bungaToggle.addEventListener("change", () => {
   const aktif = bungaToggle.checked;
 
-  if(aktif){
+  if (aktif) {
+    // tampilkan wrapper bunga berjenjang
     bungaWrapper.style.display = "block";
-    bungaWrapper.style.pointerEvents = "auto";
+    setTimeout(() => bungaWrapper.classList.add("active"), 10);
 
     // sembunyikan result utama
-    resultBox.style.display = "none";
+    resultBox.classList.add("hide");
+  } else {
+    // sembunyikan wrapper bunga
+    bungaWrapper.classList.remove("active");
+    setTimeout(() => bungaWrapper.style.display = "none", 300);
 
-    setTimeout(()=>{
-      bungaWrapper.style.opacity = "1";
-      bungaWrapper.style.transform = "translateY(0)";
-    },10);
+    // tampilkan result utama
+    resultBox.classList.remove("hide");
 
-  }else{
-    bungaWrapper.style.opacity = "0";
-    bungaWrapper.style.transform = "translateY(-6px)";
-    bungaWrapper.style.pointerEvents = "none";
-
-    // tampilkan lagi result utama
-    resultBox.style.display = "block"; // ✅ perbaikan di sini
-    
-    setTimeout(()=>{
-      bungaWrapper.style.display = "none";
-    },300);
+    // kosongkan detail bunga berjenjang
+    detailCard.innerHTML = "";
   }
 
   updateAll();
