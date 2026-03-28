@@ -1162,8 +1162,8 @@ const ratioText = document.getElementById("ratioText");
 const coupleToggle = document.getElementById("coupleToggle");
 const coupleInput = document.getElementById("coupleInput");
 const statusEl = document.getElementById("status");
-const resultBox = document.querySelector(".result");
-const detailCard = document.querySelector("#detailKPR").parentElement;
+const resultBox = document.querySelector(".result"); // element utama cicilan
+const bungaWrapper = document.querySelector(".bunga-wrapper"); // card bunga berjenjang
 
 const leadModal = document.getElementById("leadModal");
 const namaLead = document.getElementById("namaLead");
@@ -1536,7 +1536,7 @@ bungaToggle.addEventListener("change", ()=>{
     bungaWrapper.style.display = "block";
     bungaWrapper.style.pointerEvents = "auto";
 
-    // 🔥 SEMBUNYIKAN RESULT UTAMA
+    // sembunyikan result utama
     resultBox.style.display = "none";
 
     setTimeout(()=>{
@@ -1549,8 +1549,8 @@ bungaToggle.addEventListener("change", ()=>{
     bungaWrapper.style.transform = "translateY(-6px)";
     bungaWrapper.style.pointerEvents = "none";
 
-    // 🔥 TAMPILKAN LAGI RESULT
-    resultBox.style.display = "hide";
+    // tampilkan lagi result utama
+    resultBox.style.display = "block"; // ✅ perbaikan di sini
     
     setTimeout(()=>{
       bungaWrapper.style.display = "none";
