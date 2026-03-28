@@ -766,6 +766,87 @@ input.error{
 .badge.mid{background:#facc15;color:#111}
 .badge.bad{background:#ef4444;color:white}
 
+/* ===== KPR DETAIL (UPGRADE UI) ===== */
+.kpr-detail{
+  margin-top:20px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.kpr-item{
+  padding:16px;
+  border-radius:18px;
+  background:rgba(255,255,255,.06);
+  border:1px solid var(--border);
+  backdrop-filter:blur(14px);
+  transition:.25s;
+}
+
+.kpr-item:hover{
+  transform:translateY(-2px);
+  box-shadow:0 12px 28px rgba(0,0,0,.15);
+}
+
+.kpr-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:10px;
+}
+
+.kpr-title{
+  font-size:14px;
+  font-weight:600;
+}
+
+.kpr-badge{
+  font-size:11px;
+  padding:4px 10px;
+  border-radius:999px;
+  background:rgba(99,102,241,.2);
+  color:#a5b4fc;
+}
+
+.kpr-row{
+  display:flex;
+  justify-content:space-between;
+  font-size:13px;
+  margin-bottom:6px;
+  color:var(--muted);
+}
+
+.kpr-value{
+  font-weight:600;
+  color:var(--text);
+}
+
+.kpr-progress{
+  height:6px;
+  border-radius:999px;
+  background:rgba(255,255,255,.1);
+  margin-top:8px;
+}
+.kpr-progress div{
+  height:100%;
+  border-radius:999px;
+  background:linear-gradient(90deg,#6366f1,#22d3ee);
+}
+
+/* warna beda tiap fase */
+.kpr-item.fix1{
+  border-color:rgba(34,197,94,.35);
+}
+.kpr-item.fix2{
+  border-color:rgba(59,130,246,.35);
+}
+.kpr-item.fix3{
+  border-color:rgba(234,179,8,.35);
+}
+.kpr-item.float{
+  border-color:rgba(239,68,68,.35);
+}
+
 </style>
 </head>
 
@@ -865,7 +946,10 @@ input.error{
   Cicilan: <strong id="floatCicilan">Rp 0</strong>
 </div>
 
-<div id="detailKPR" style="margin-top:20px;"></div>
+<div class="card" style="margin-top:18px;">
+  <h3 style="margin-bottom:12px;">📊 Detail Cicilan Berjenjang</h3>
+  <div id="detailKPR"></div>
+</div>
     
 <!-- FINANCE CARD PRO -->
 <div class="finance-card pro">
@@ -1134,18 +1218,51 @@ function hitungMultiStage(){
 function renderDetail(data){
   const el = document.getElementById("detailKPR");
 
-  el.innerHTML = data.map(d=>`
-    <div style="
-      padding:12px;
-      margin-bottom:10px;
-      border-radius:12px;
-      background:rgba(255,255,255,.05)
-    ">
-      <strong>Tahun ${d.label}</strong><br>
-      Bunga: ${d.bunga}%<br>
-      Cicilan: Rp ${formatRupiah(d.cicilan)}
+  el.innerHTML = `
+    <div class="kpr-detail">
+      ${data.map((d,i)=>{
+
+        let cls = "fix1";
+        let badge = "FIX";
+
+        if(i === 1) cls = "fix2";
+        if(i === 2) cls = "fix3";
+        if(i === 3){
+          cls = "float";
+          badge = "FLOATING";
+        }
+
+        return `
+        <div class="kpr-item ${cls}">
+          
+          <div class="kpr-head">
+            <div class="kpr-title">
+              Tahun ${d.label}
+            </div>
+            <div class="kpr-badge">${badge}</div>
+          </div>
+
+          <div class="kpr-row">
+            <span>Bunga</span>
+            <span class="kpr-value">${d.bunga}%</span>
+          </div>
+
+          <div class="kpr-row">
+            <span>Cicilan / bulan</span>
+            <span class="kpr-value">
+              Rp ${formatRupiah(d.cicilan)}
+            </span>
+          </div>
+          
+          <div class="kpr-progress">
+            <div style="width:${d.bunga * 5}%"></div>
+          </div>
+
+        </div>
+        `;
+      }).join("")}
     </div>
-  `).join("");
+  `;
 }
 
 /* =========================================================
