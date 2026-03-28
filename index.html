@@ -1325,13 +1325,14 @@ function initDefault(){
    AMBIL CICILAN BERSIH
 ========================================================= */
 function getCicilan(){
-  return lastCicilan || 0;
+  return cleanNumber(
+    hasil.textContent.replace(/[^\d]/g,"")
+  );
 }
 
 /* =========================================================
    HITUNG CICILAN UTAMA
 ========================================================= */
-let lastCicilan = 0;
 function hitung(){
   const harga = cleanNumber(hargaEl.value);
   if(!harga) return;
@@ -1339,8 +1340,6 @@ function hitung(){
   const dp = harga * (dpEl.value/100);
   const pokok = harga - dp;
   const bulan = tenorEl.value * 12;
-  
-  lastCicilan = Math.round(cicilan);
 
   // 👉 kalau mode berjenjang aktif, skip
   if(bungaToggle.checked){
