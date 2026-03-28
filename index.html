@@ -847,6 +847,10 @@ input.error{
   border-color:rgba(239,68,68,.35);
 }
 
+#bungaWrapper{
+  transition:.3s ease;
+}
+
 </style>
 </head>
 
@@ -895,30 +899,37 @@ input.error{
         <div class="progress-fill" id="tenorBar"></div>
       </div>
     </div>
+    
+    <div class="couple-box">
+      <label class="switch">
+        <input type="checkbox" id="bungaToggle">
+        <span class="slider"></span>
+      </label>
+      <span class="label">Aktifkan Bunga Berjenjang</span>
+    </div>
+    
+    <div id="bungaWrapper" style="display:none;">
 
-    <div class="field">
-      <label>Bunga (% / tahun)</label>
-      <input id="bunga" type="number" inputmode="numeric" value="8">
-    </div>
+      <div class="field">
+        <label>Bunga Tahun 1 (%)</label>
+        <input id="bunga1" type="number" inputmode="numeric" value="5">
+      </div>
     
-    <div class="field">
-      <label>Bunga Tahun 1 (%)</label>
-      <input id="bunga1" type="number" inputmode="numeric" value="5">
-    </div>
+      <div class="field">
+        <label>Bunga Tahun 2–3 (%)</label>
+        <input id="bunga23" type="number" inputmode="numeric" value="6">
+      </div>
     
-    <div class="field">
-      <label>Bunga Tahun 2–3 (%)</label>
-      <input id="bunga23" type="number" inputmode="numeric" value="6">
-    </div>
+      <div class="field">
+        <label>Bunga Tahun 4–5 (%)</label>
+        <input id="bunga45" type="number" inputmode="numeric" value="7">
+      </div>
     
-    <div class="field">
-      <label>Bunga Tahun 4–5 (%)</label>
-      <input id="bunga45" type="number" inputmode="numeric" value="7">
-    </div>
+      <div class="field">
+        <label>Bunga Floating (%)</label>
+        <input id="bungaFloat" type="number" inputmode="numeric" value="10">
+      </div>
     
-    <div class="field">
-      <label>Bunga Floating (%)</label>
-      <input id="bungaFloat" type="number" inputmode="numeric" value="10">
     </div>
 
     <div class="result">
@@ -1137,6 +1148,8 @@ const unitMatchEl = document.getElementById("unitMatch");
 const testiItems = document.querySelectorAll(".testi-item");
 const testiDots = document.getElementById("testiDots");
 const slider = document.getElementById("testiSlider");
+const bungaToggle = document.getElementById("bungaToggle");
+const bungaWrapper = document.getElementById("bungaWrapper");
 
 const testiData = {
   ok: [
@@ -1287,6 +1300,12 @@ function getCicilan(){
    HITUNG CICILAN UTAMA
 ========================================================= */
 function hitung(){
+  
+  if(bungaToggle.checked){
+    hasil.textContent = "Rp 0";
+    return;
+  }
+  
   const harga = cleanNumber(hargaEl.value);
   if(!harga) return;
 
@@ -1428,6 +1447,12 @@ function updateAll(){
   updateGaji();
   generateAdvice();
   generateUnitMatch();
+  
+  if(bungaToggle.checked){
+    hitungMultiStage();
+  }else{
+    document.getElementById("detailKPR").innerHTML = "";
+  }
 }
 
 /* =========================================================
@@ -1455,6 +1480,20 @@ function updateAll(){
 ========================================================= */
 coupleToggle.addEventListener("change",()=>{
   coupleInput.classList.toggle("show", coupleToggle.checked);
+  updateAll();
+});
+
+bungaToggle.addEventListener("change", ()=>{
+  const aktif = bungaToggle.checked;
+
+  // tampilkan input bertahap
+  bungaWrapper.style.display = aktif ? "block" : "none";
+
+  // reset hasil utama
+  if(aktif){
+    hasil.textContent = "Rp 0";
+  }
+
   updateAll();
 });
 
