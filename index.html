@@ -131,6 +131,12 @@ input.error{
   border-radius:18px;
   background:linear-gradient(135deg,var(--primary),var(--accent));
   color:white;
+  transition:.3s;
+}
+
+.result.hide{
+  opacity:0;
+  transform:translateY(10px);
 }
 .result h2{font-size:32px;margin:6px 0 0}
 
@@ -957,7 +963,11 @@ input.error{
     </div>
 
     <div id="savedList" class="saved-list"></div>
-
+    
+    <div class="card" style="margin-top:18px;">
+      <h3 style="margin-bottom:12px;">📊 Detail Cicilan Berjenjang</h3>
+      <div id="detailKPR"></div>
+    </div>
     
     <div class="info-box">
   🏦 Simulasi Bank:
@@ -969,11 +979,6 @@ input.error{
 
   <strong>Floating</strong><br>
   Cicilan: <strong id="floatCicilan">Rp 0</strong>
-</div>
-
-<div class="card" style="margin-top:18px;">
-  <h3 style="margin-bottom:12px;">📊 Detail Cicilan Berjenjang</h3>
-  <div id="detailKPR"></div>
 </div>
     
 <!-- FINANCE CARD PRO -->
@@ -1148,7 +1153,6 @@ const tenorVal = document.getElementById("tenorVal");
 
 const fixCicilanEl = document.getElementById("fixCicilan");
 const floatCicilanEl = document.getElementById("floatCicilan");
-
 const gajiMinEl = document.getElementById("gajiMin");
 const gajiEl = document.getElementById("gaji");
 const gajiSuamiEl = document.getElementById("gajiSuami");
@@ -1157,8 +1161,9 @@ const financeBar = document.getElementById("financeBar");
 const ratioText = document.getElementById("ratioText");
 const coupleToggle = document.getElementById("coupleToggle");
 const coupleInput = document.getElementById("coupleInput");
-
 const statusEl = document.getElementById("status");
+const resultBox = document.querySelector(".result");
+const detailCard = document.querySelector("#detailKPR").parentElement;
 
 const leadModal = document.getElementById("leadModal");
 const namaLead = document.getElementById("namaLead");
@@ -1254,9 +1259,11 @@ function hitungMultiStage(){
 
   // 👉 ambil cicilan rata-rata untuk ditampilkan di atas
   const avg =
-    resultDetail.reduce((a,b)=>a + b.cicilan,0) / resultDetail.length;
+  resultDetail.reduce((a,b)=>a + b.cicilan,0) / resultDetail.length;
 
-  hasil.textContent = "Rp " + formatRupiah(Math.round(avg));
+  lastCicilan = Math.round(avg);
+  
+  hasil.textContent = "Rp " + formatRupiah(lastCicilan);
 }
 
 function renderDetail(data){
@@ -1322,14 +1329,13 @@ function initDefault(){
    AMBIL CICILAN BERSIH
 ========================================================= */
 function getCicilan(){
-  return cleanNumber(
-    hasil.textContent.replace(/[^\d]/g,"")
-  );
+  return lastCicilan || 0;
 }
 
 /* =========================================================
    HITUNG CICILAN UTAMA
 ========================================================= */
+let lastCicilan = 0;
 function hitung(){
   const harga = cleanNumber(hargaEl.value);
   if(!harga) return;
@@ -1337,6 +1343,8 @@ function hitung(){
   const dp = harga * (dpEl.value/100);
   const pokok = harga - dp;
   const bulan = tenorEl.value * 12;
+  
+  lastCicilan = Math.round(cicilan);
 
   // 👉 kalau mode berjenjang aktif, skip
   if(bungaToggle.checked){
@@ -1476,8 +1484,15 @@ function updateAll(){
 
   if(bungaToggle.checked){
     hitungMultiStage();
+
+    // tampilkan detail
+    detailCard.style.display = "block";
+
   }else{
     document.getElementById("detailKPR").innerHTML = "";
+
+    // sembunyikan detail
+    detailCard.style.display = "none";
   }
 
   updateProgress();
@@ -1519,9 +1534,10 @@ bungaToggle.addEventListener("change", ()=>{
 
   if(aktif){
     bungaWrapper.style.display = "block";
-
-    // ✅ TAMBAH INI
     bungaWrapper.style.pointerEvents = "auto";
+
+    // 🔥 SEMBUNYIKAN RESULT UTAMA
+    resultBox.style.display = "none";
 
     setTimeout(()=>{
       bungaWrapper.style.opacity = "1";
@@ -1531,9 +1547,10 @@ bungaToggle.addEventListener("change", ()=>{
   }else{
     bungaWrapper.style.opacity = "0";
     bungaWrapper.style.transform = "translateY(-6px)";
-
-    // ⛔ MATIKAN LAGI
     bungaWrapper.style.pointerEvents = "none";
+
+    // 🔥 TAMPILKAN LAGI RESULT
+    resultBox.style.display = "hide";
     
     setTimeout(()=>{
       bungaWrapper.style.display = "none";
