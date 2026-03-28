@@ -850,8 +850,8 @@ input.error{
 #bungaWrapper{
   opacity:0;
   transform:translateY(-6px);
-  transition:.3s ease;
   pointer-events:none;
+  transition:.3s;
 }
 
 #bungaWrapper.active{
@@ -1524,17 +1524,25 @@ bungaToggle.addEventListener("change", ()=>{
   const aktif = bungaToggle.checked;
 
   if(aktif){
-    bungaWrapper.style.display = "block"; // ⬅️ WAJIB TAMBAH INI
+    bungaWrapper.style.display = "block";
+
+    // ✅ TAMBAH INI
+    bungaWrapper.style.pointerEvents = "auto";
+
     setTimeout(()=>{
       bungaWrapper.style.opacity = "1";
       bungaWrapper.style.transform = "translateY(0)";
     },10);
+
   }else{
     bungaWrapper.style.opacity = "0";
     bungaWrapper.style.transform = "translateY(-6px)";
+
+    // ⛔ MATIKAN LAGI
+    bungaWrapper.style.pointerEvents = "none";
     
     setTimeout(()=>{
-      bungaWrapper.style.display = "none"; // ⬅️ sembunyikan lagi
+      bungaWrapper.style.display = "none";
     },300);
   }
 
