@@ -819,6 +819,26 @@ input.error{
       <label>Bunga (% / tahun)</label>
       <input id="bunga" type="number" inputmode="numeric" value="8">
     </div>
+    
+    <div class="field">
+      <label>Bunga Tahun 1 (%)</label>
+      <input id="bunga1" type="number" inputmode="numeric" value="5">
+    </div>
+    
+    <div class="field">
+      <label>Bunga Tahun 2–3 (%)</label>
+      <input id="bunga23" type="number" inputmode="numeric" value="6">
+    </div>
+    
+    <div class="field">
+      <label>Bunga Tahun 4–5 (%)</label>
+      <input id="bunga45" type="number" inputmode="numeric" value="7">
+    </div>
+    
+    <div class="field">
+      <label>Bunga Floating (%)</label>
+      <input id="bungaFloat" type="number" inputmode="numeric" value="10">
+    </div>
 
     <div class="result">
       <small>Perkiraan Cicilan / bulan</small>
@@ -844,6 +864,8 @@ input.error{
   <strong>Floating</strong><br>
   Cicilan: <strong id="floatCicilan">Rp 0</strong>
 </div>
+
+<div id="detailKPR" style="margin-top:20px;"></div>
     
 <!-- FINANCE CARD PRO -->
 <div class="finance-card pro">
@@ -1057,6 +1079,75 @@ const testiData = {
   ]
 };
 
+function hitungCicilan(pokok, bungaTahunan, bulan){
+  const bunga = (bungaTahunan/100)/12;
+
+  return pokok * bunga / (1 - Math.pow(1+bunga, -bulan));
+}
+
+function hitungMultiStage(){
+  const harga = cleanNumber(hargaEl.value);
+  if(!harga) return;
+
+  const dp = harga * (dpEl.value/100);
+  let sisaPokok = harga - dp;
+
+  const tenorTahun = parseInt(tenorEl.value);
+  const totalBulan = tenorTahun * 12;
+
+  // bunga input
+  const b1 = parseFloat(document.getElementById("bunga1").value);
+  const b23 = parseFloat(document.getElementById("bunga23").value);
+  const b45 = parseFloat(document.getElementById("bunga45").value);
+  const bFloat = parseFloat(document.getElementById("bungaFloat").value);
+
+  let resultDetail = [];
+
+  function proses(tahunMulai, tahunAkhir, bunga){
+    let bulan = (tahunAkhir - tahunMulai + 1) * 12;
+
+    const cicilan = hitungCicilan(sisaPokok, bunga, totalBulan);
+
+    // kurangi pokok
+    for(let i=0;i<bulan;i++){
+      let bungaBulanan = (bunga/100)/12;
+      let bungaNominal = sisaPokok * bungaBulanan;
+      let pokokBayar = cicilan - bungaNominal;
+      sisaPokok -= pokokBayar;
+    }
+
+    resultDetail.push({
+      label: `${tahunMulai}-${tahunAkhir}`,
+      bunga: bunga,
+      cicilan: Math.round(cicilan)
+    });
+  }
+
+  proses(1,1,b1);
+  proses(2,3,b23);
+  proses(4,5,b45);
+  proses(6,tenorTahun,bFloat);
+
+  renderDetail(resultDetail);
+}
+
+function renderDetail(data){
+  const el = document.getElementById("detailKPR");
+
+  el.innerHTML = data.map(d=>`
+    <div style="
+      padding:12px;
+      margin-bottom:10px;
+      border-radius:12px;
+      background:rgba(255,255,255,.05)
+    ">
+      <strong>Tahun ${d.label}</strong><br>
+      Bunga: ${d.bunga}%<br>
+      Cicilan: Rp ${formatRupiah(d.cicilan)}
+    </div>
+  `).join("");
+}
+
 /* =========================================================
    INIT DEFAULT VALUE (WAJIB)
 ========================================================= */
@@ -1215,6 +1306,7 @@ function updateProgress(){
 function updateAll(){
   hitung();
   hitungBank();
+  hitungMultiStage();
   updateProgress();
   updateGaji();
   generateAdvice();
