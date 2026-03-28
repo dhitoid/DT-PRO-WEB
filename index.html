@@ -903,6 +903,11 @@ input.error{
       </div>
     </div>
     
+    <div class="field" id="singleBungaField">
+      <label>Bunga (%)</label>
+      <input id="bunga" type="number" inputmode="numeric" value="5">
+    </div>
+    
     <div class="couple-box">
       <label class="switch">
         <input type="checkbox" id="bungaToggle">
@@ -1153,6 +1158,7 @@ const testiDots = document.getElementById("testiDots");
 const slider = document.getElementById("testiSlider");
 const bungaToggle = document.getElementById("bungaToggle");
 const bungaWrapper = document.getElementById("bungaWrapper");
+const singleBungaField = document.getElementById("singleBungaField");
 
 const testiData = {
   ok: [
@@ -1303,20 +1309,20 @@ function getCicilan(){
    HITUNG CICILAN UTAMA
 ========================================================= */
 function hitung(){
-  
-  if(bungaToggle.checked){
-    hasil.textContent = "Rp 0";
-    return;
-  }
-  
   const harga = cleanNumber(hargaEl.value);
   if(!harga) return;
 
   const dp = harga * (dpEl.value/100);
   const pokok = harga - dp;
   const bulan = tenorEl.value * 12;
-  const bunga = (bungaEl.value/100)/12;
 
+  // 👉 kalau mode berjenjang aktif, skip
+  if(bungaToggle.checked){
+    hasil.textContent = "Rp -";
+    return;
+  }
+
+  const bunga = (bungaEl.value/100)/12;
   if(!bulan || !bunga) return;
 
   const cicilan =
@@ -1445,17 +1451,17 @@ function updateProgress(){
 function updateAll(){
   hitung();
   hitungBank();
-  hitungMultiStage();
-  updateProgress();
-  updateGaji();
-  generateAdvice();
-  generateUnitMatch();
-  
+
   if(bungaToggle.checked){
     hitungMultiStage();
   }else{
     document.getElementById("detailKPR").innerHTML = "";
   }
+
+  updateProgress();
+  updateGaji();
+  generateAdvice();
+  generateUnitMatch();
 }
 
 /* =========================================================
@@ -1489,15 +1495,8 @@ coupleToggle.addEventListener("change",()=>{
 bungaToggle.addEventListener("change", ()=>{
   const aktif = bungaToggle.checked;
 
-  // tampilkan input bertahap
-  bungaWrapper.style.opacity = aktif ? "1" : "0";
-  bungaWrapper.style.transform = aktif ? "translateY(0)" : "translateY(-6px)";
-  bungaWrapper.style.pointerEvents = aktif ? "auto" : "none";
-  
-  // reset hasil utama
-  if(aktif){
-    hasil.textContent = "Rp 0";
-  }
+  bungaWrapper.style.display = aktif ? "block" : "none";
+  singleBungaField.style.display = aktif ? "none" : "block";
 
   updateAll();
 });
