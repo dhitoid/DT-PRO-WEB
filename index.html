@@ -1162,6 +1162,7 @@ const ratioText = document.getElementById("ratioText");
 const coupleToggle = document.getElementById("coupleToggle");
 const coupleInput = document.getElementById("coupleInput");
 const statusEl = document.getElementById("status");
+const resultBox = document.querySelector(".result");
 
 const leadModal = document.getElementById("leadModal");
 const namaLead = document.getElementById("namaLead");
@@ -1492,7 +1493,7 @@ function updateAll(){
 /* =========================================================
    EVENT INPUT
 ========================================================= */
-[hargaEl, dpEl, tenorEl].forEach(el=>{
+[hargaEl, dpEl, tenorEl, bungaEl].forEach(el=>{
   el.addEventListener("input",()=>{
     if(el === hargaEl){
       el.value = formatRupiah(cleanNumber(el.value));
@@ -1522,8 +1523,6 @@ bungaToggle.addEventListener("change", ()=>{
 
   if(aktif){
     bungaWrapper.style.display = "block";
-
-    // ✅ TAMBAH INI
     bungaWrapper.style.pointerEvents = "auto";
 
     setTimeout(()=>{
@@ -1531,16 +1530,20 @@ bungaToggle.addEventListener("change", ()=>{
       bungaWrapper.style.transform = "translateY(0)";
     },10);
 
+    // 🔽 TAMBAHAN — sembunyikan perkiraan cicilan
+    resultBox.classList.add("hide");
+
   }else{
     bungaWrapper.style.opacity = "0";
     bungaWrapper.style.transform = "translateY(-6px)";
-
-    // ⛔ MATIKAN LAGI
     bungaWrapper.style.pointerEvents = "none";
     
     setTimeout(()=>{
       bungaWrapper.style.display = "none";
     },300);
+
+    // 🔽 TAMBAHAN — tampilkan kembali
+    resultBox.classList.remove("hide");
   }
 
   updateAll();
