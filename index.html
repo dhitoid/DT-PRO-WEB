@@ -1162,8 +1162,6 @@ const ratioText = document.getElementById("ratioText");
 const coupleToggle = document.getElementById("coupleToggle");
 const coupleInput = document.getElementById("coupleInput");
 const statusEl = document.getElementById("status");
-const resultBox = document.querySelector(".result");
-const detailCard = document.getElementById("detailKPR");
 
 const leadModal = document.getElementById("leadModal");
 const namaLead = document.getElementById("namaLead");
@@ -1259,11 +1257,9 @@ function hitungMultiStage(){
 
   // 👉 ambil cicilan rata-rata untuk ditampilkan di atas
   const avg =
-  resultDetail.reduce((a,b)=>a + b.cicilan,0) / resultDetail.length;
+    resultDetail.reduce((a,b)=>a + b.cicilan,0) / resultDetail.length;
 
-  lastCicilan = Math.round(avg);
-  
-  hasil.textContent = "Rp " + formatRupiah(lastCicilan);
+  hasil.textContent = "Rp " + formatRupiah(Math.round(avg));
 }
 
 function renderDetail(data){
@@ -1478,18 +1474,14 @@ function updateProgress(){
 /* =========================================================
    UPDATE SEMUA (REALTIME)
 ========================================================= */
-function updateAll() {
-  hitung();        // hitung cicilan normal
-  hitungBank();    // hitung cicilan bank fix/floating
+function updateAll(){
+  hitung();
+  hitungBank();
 
-  if (bungaToggle.checked) {
-    hitungMultiStage(); // hitung cicilan berjenjang
-
-    // tampilkan detail
-    detailCard.style.display = "block";
-  } else {
-    // sembunyikan detail
-    detailCard.style.display = "none";
+  if(bungaToggle.checked){
+    hitungMultiStage();
+  }else{
+    document.getElementById("detailKPR").innerHTML = "";
   }
 
   updateProgress();
@@ -1526,26 +1518,30 @@ coupleToggle.addEventListener("change",()=>{
   updateAll();
 });
 
-bungaToggle.addEventListener("change", () => {
+bungaToggle.addEventListener("change", ()=>{
   const aktif = bungaToggle.checked;
 
-  if (aktif) {
-    // tampilkan wrapper bunga berjenjang
+  if(aktif){
     bungaWrapper.style.display = "block";
-    setTimeout(() => bungaWrapper.classList.add("active"), 10);
 
-    // sembunyikan result utama
-    resultBox.classList.add("hide");
-  } else {
-    // sembunyikan wrapper bunga
-    bungaWrapper.classList.remove("active");
-    setTimeout(() => bungaWrapper.style.display = "none", 300);
+    // ✅ TAMBAH INI
+    bungaWrapper.style.pointerEvents = "auto";
 
-    // tampilkan result utama
-    resultBox.classList.remove("hide");
+    setTimeout(()=>{
+      bungaWrapper.style.opacity = "1";
+      bungaWrapper.style.transform = "translateY(0)";
+    },10);
 
-    // kosongkan detail bunga berjenjang
-    detailCard.innerHTML = "";
+  }else{
+    bungaWrapper.style.opacity = "0";
+    bungaWrapper.style.transform = "translateY(-6px)";
+
+    // ⛔ MATIKAN LAGI
+    bungaWrapper.style.pointerEvents = "none";
+    
+    setTimeout(()=>{
+      bungaWrapper.style.display = "none";
+    },300);
   }
 
   updateAll();
