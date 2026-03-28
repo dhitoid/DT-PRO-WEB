@@ -905,7 +905,7 @@ input.error{
     
     <div class="field" id="singleBungaField">
       <label>Bunga (%)</label>
-      <input id="bunga" type="number" inputmode="numeric" value="5">
+      <input id="bunga" type="number" inputmode="decimal" value="5">
     </div>
     
     <div class="couple-box">
@@ -920,22 +920,22 @@ input.error{
 
       <div class="field">
         <label>Bunga Tahun 1 (%)</label>
-        <input id="bunga1" type="number" inputmode="numeric" value="5">
+        <input id="bunga1" type="number" inputmode="decimal" value="5">
       </div>
     
       <div class="field">
         <label>Bunga Tahun 2–3 (%)</label>
-        <input id="bunga23" type="number" inputmode="numeric" value="6">
+        <input id="bunga23" type="number" inputmode="decimal" value="6">
       </div>
     
       <div class="field">
         <label>Bunga Tahun 4–5 (%)</label>
-        <input id="bunga45" type="number" inputmode="numeric" value="7">
+        <input id="bunga45" type="number" inputmode="decimal" value="7">
       </div>
     
       <div class="field">
         <label>Bunga Floating (%)</label>
-        <input id="bungaFloat" type="number" inputmode="numeric" value="10">
+        <input id="bungaFloat" type="number" inputmode="decimal" value="10">
       </div>
     
     </div>
@@ -1117,6 +1117,15 @@ function cleanNumber(v){
   return parseInt(String(v).replace(/\./g,"")) || 0;
 }
 
+function parseDecimal(val){
+  if(!val) return 0;
+  return parseFloat(
+    String(val)
+      .replace(",", ".") // koma jadi titik
+      .replace(/[^0-9.]/g,"")
+  ) || 0;
+}
+
 /* =========================================================
    DOM ELEMENT
 ========================================================= */
@@ -1157,6 +1166,19 @@ const testiItems = document.querySelectorAll(".testi-item");
 const testiDots = document.getElementById("testiDots");
 const slider = document.getElementById("testiSlider");
 const bungaToggle = document.getElementById("bungaToggle");
+const bungaInputs = [
+  document.getElementById("bunga1"),
+  document.getElementById("bunga23"),
+  document.getElementById("bunga45"),
+  document.getElementById("bungaFloat")
+];
+
+// realtime update saat bunga diubah
+bungaInputs.forEach(input=>{
+  input.addEventListener("input", ()=>{
+    updateAll();
+  });
+});
 const bungaWrapper = document.getElementById("bungaWrapper");
 const singleBungaField = document.getElementById("singleBungaField");
 
@@ -1202,11 +1224,11 @@ function hitungMultiStage(){
   const totalBulan = tenorTahun * 12;
 
   // bunga input
-  const b1 = parseFloat(document.getElementById("bunga1").value);
-  const b23 = parseFloat(document.getElementById("bunga23").value);
-  const b45 = parseFloat(document.getElementById("bunga45").value);
-  const bFloat = parseFloat(document.getElementById("bungaFloat").value);
-
+  const b1 = parseDecimal(document.getElementById("bunga1").value);
+  const b23 = parseDecimal(document.getElementById("bunga23").value);
+  const b45 = parseDecimal(document.getElementById("bunga45").value);
+  const bFloat = parseDecimal(document.getElementById("bungaFloat").value);
+  
   let resultDetail = [];
 
   function proses(tahunMulai, tahunAkhir, bunga){
@@ -1322,7 +1344,7 @@ function hitung(){
     return;
   }
 
-  const bunga = (bungaEl.value/100)/12;
+  const bunga = (parseDecimal(bungaEl.value)/100)/12;
   if(!bulan || !bunga) return;
 
   const cicilan =
