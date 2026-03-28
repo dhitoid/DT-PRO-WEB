@@ -1223,46 +1223,40 @@ function hitungMultiStage(){
   const harga = cleanNumber(hargaEl.value);
   if(!harga) return;
 
-  const dp = harga * (dpEl.value/100);
-  let sisaPokok = harga - dp;
-
   const tenorTahun = parseInt(tenorEl.value);
   const totalBulan = tenorTahun * 12;
 
-  // bunga input
+  // ambil bunga (support koma)
   const b1 = parseDecimal(document.getElementById("bunga1").value);
   const b23 = parseDecimal(document.getElementById("bunga23").value);
   const b45 = parseDecimal(document.getElementById("bunga45").value);
   const bFloat = parseDecimal(document.getElementById("bungaFloat").value);
-  
+
   let resultDetail = [];
 
-  function proses(tahunMulai, tahunAkhir, bunga){
-    let bulan = (tahunAkhir - tahunMulai + 1) * 12;
-
-    const cicilan = hitungCicilan(sisaPokok, bunga, totalBulan);
-
-    // kurangi pokok
-    for(let i=0;i<bulan;i++){
-      let bungaBulanan = (bunga/100)/12;
-      let bungaNominal = sisaPokok * bungaBulanan;
-      let pokokBayar = cicilan - bungaNominal;
-      sisaPokok -= pokokBayar;
-    }
+  function proses(label, bunga){
+    const cicilan = hitungCicilan(harga, bunga, totalBulan);
 
     resultDetail.push({
-      label: `${tahunMulai}-${tahunAkhir}`,
+      label: label,
       bunga: bunga,
       cicilan: Math.round(cicilan)
     });
   }
 
-  proses(1,1,b1);
-  proses(2,3,b23);
-  proses(4,5,b45);
-  proses(6,tenorTahun,bFloat);
+  // langsung mapping fase
+  proses("1", b1);
+  proses("2-3", b23);
+  proses("4-5", b45);
+  proses(`6-${tenorTahun}`, bFloat);
 
   renderDetail(resultDetail);
+
+  // 👉 ambil cicilan rata-rata untuk ditampilkan di atas
+  const avg =
+    resultDetail.reduce((a,b)=>a + b.cicilan,0) / resultDetail.length;
+
+  hasil.textContent = "Rp " + formatRupiah(Math.round(avg));
 }
 
 function renderDetail(data){
