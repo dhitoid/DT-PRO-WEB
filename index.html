@@ -1495,8 +1495,20 @@ coupleToggle.addEventListener("change",()=>{
 bungaToggle.addEventListener("change", ()=>{
   const aktif = bungaToggle.checked;
 
-  bungaWrapper.style.display = aktif ? "block" : "none";
-  singleBungaField.style.display = aktif ? "none" : "block";
+  if(aktif){
+    bungaWrapper.style.display = "block"; // ⬅️ WAJIB TAMBAH INI
+    setTimeout(()=>{
+      bungaWrapper.style.opacity = "1";
+      bungaWrapper.style.transform = "translateY(0)";
+    },10);
+  }else{
+    bungaWrapper.style.opacity = "0";
+    bungaWrapper.style.transform = "translateY(-6px)";
+    
+    setTimeout(()=>{
+      bungaWrapper.style.display = "none"; // ⬅️ sembunyikan lagi
+    },300);
+  }
 
   updateAll();
 });
