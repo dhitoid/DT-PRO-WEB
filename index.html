@@ -1935,28 +1935,47 @@ if ("serviceWorker" in navigator) {
 let deferredPrompt;
 const installBtn = document.getElementById("installBtn");
 
-// muncul kalau bisa di install
+// deteksi iOS
+function isIOS() {
+  return /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+}
+
+// deteksi standalone (sudah install)
+function isInStandaloneMode() {
+  return ('standalone' in window.navigator) && (window.navigator.standalone);
+}
+
+// ANDROID
 window.addEventListener("beforeinstallprompt", (e) => {
   e.preventDefault();
   deferredPrompt = e;
   installBtn.style.display = "block";
 });
 
-// klik tombol install
+// klik tombol
 installBtn.addEventListener("click", async () => {
-  if (!deferredPrompt) return;
 
-  deferredPrompt.prompt();
-  const { outcome } = await deferredPrompt.userChoice;
-
-  if (outcome === "accepted") {
-    installBtn.style.display = "none";
+  // iOS manual guide
+  if (isIOS()) {
+    alert("Install aplikasi:\n1. Tap tombol Share\n2. Pilih 'Add to Home Screen'\n3. Tap Add");
+    return;
   }
 
+  // Android install
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
   deferredPrompt = null;
 });
 
-// kalau sudah terinstall → sembunyikan tombol
+// iOS tampilkan tombol manual
+window.addEventListener("load", () => {
+  if (isIOS() && !isInStandaloneMode()) {
+    installBtn.style.display = "block";
+  }
+});
+
+// kalau sudah install
 window.addEventListener("appinstalled", () => {
   installBtn.style.display = "none";
 });
