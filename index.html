@@ -892,6 +892,26 @@ input.error{
   transition:.3s;
 }
 
+.install-btn{
+  position:fixed;
+  right:16px;
+  bottom:90px;
+  padding:14px 18px;
+  border-radius:16px;
+  border:none;
+  font-weight:600;
+  color:white;
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  box-shadow:0 12px 24px rgba(0,0,0,.25);
+  display:none;
+  z-index:999;
+  animation:fadeUp .4s ease;
+}
+
+.install-btn:active{
+  transform:scale(.96);
+}
+
 </style>
 </head>
 
@@ -1123,6 +1143,10 @@ input.error{
   © <span id="year"></span> <strong>dhitoproperty.id</strong><br>
   Kalkulator KPR Profesional
 </footer>
+
+<button id="installBtn" class="install-btn">
+📲 Install Aplikasi
+</button>
 
 <div class="cta">
   <button onclick="openLead()">💬 Konsultasi & Hasil Lengkap</button>
@@ -1907,6 +1931,35 @@ function showTesti(i){
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("service-worker.js");
 }
+
+let deferredPrompt;
+const installBtn = document.getElementById("installBtn");
+
+// muncul kalau bisa di install
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  installBtn.style.display = "block";
+});
+
+// klik tombol install
+installBtn.addEventListener("click", async () => {
+  if (!deferredPrompt) return;
+
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+
+  if (outcome === "accepted") {
+    installBtn.style.display = "none";
+  }
+
+  deferredPrompt = null;
+});
+
+// kalau sudah terinstall → sembunyikan tombol
+window.addEventListener("appinstalled", () => {
+  installBtn.style.display = "none";
+});
 
 /* AUTO PLAY */
 setInterval(()=>{
