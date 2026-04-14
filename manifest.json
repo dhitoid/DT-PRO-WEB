@@ -1,6 +1,6 @@
 {
   "name": "Kalkulator KPR",
-  "short_name": "KPR",
+  "short_name": "Kalkulator KPR DT",
   "start_url": "/DT-PRO-WEB/",
   "display": "standalone",
   "background_color": "#0b1020",
